@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏙️ Build-a-City: Adult Learning Styles</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --yellow:#FFD93D;--coral:#FF6B6B;--teal:#4ECDC4;--purple:#A29BFE;
+  --green:#6BCB77;--blue:#5B8FF9;--orange:#FDCB6E;--pink:#FF8FB1;
+  --sky1:#C8ECFF;--sky2:#E8F7FF;--ground:#7EC850;
+  --bg:#FFF8EC;--card:#FFFFFF;--text:#2D3436;--muted:#636E72;
+  --shadow:0 4px 20px rgba(0,0,0,0.10);
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.fredoka{font-family:'Fredoka One',cursive;letter-spacing:0.01em}
+button{font-family:'Nunito',sans-serif}
+
+/* ── WELCOME ── */
+#screen-welcome{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  background:linear-gradient(180deg,#5DADE2 0%,#85C1E9 25%,#D6EAF8 55%,#FEF9E7 80%);
+  text-align:center;padding:0;overflow:hidden;position:relative
+}
+.welcome-sun{position:absolute;top:22px;right:55px;width:78px;height:78px;
+  background:radial-gradient(circle,#FFE066 40%,#F9CA24 100%);border-radius:50%;
+  box-shadow:0 0 0 18px rgba(255,217,61,0.16),0 0 0 38px rgba(255,217,61,0.07)}
+.wcloud{position:absolute;background:#fff;border-radius:50px;opacity:0.88}
+.wcloud::before,.wcloud::after{content:'';position:absolute;background:#fff;border-radius:50%}
+.wc1{width:110px;height:36px;top:55px;left:44px}.wc1::before{width:54px;height:54px;top:-26px;left:12px}.wc1::after{width:42px;height:42px;top:-18px;left:50px}
+.wc2{width:85px;height:28px;top:95px;right:150px}.wc2::before{width:42px;height:42px;top:-20px;left:8px}.wc2::after{width:33px;height:33px;top:-14px;left:38px}
+.welcome-inner{position:relative;z-index:2;padding:0 1.5rem 3rem;display:flex;flex-direction:column;align-items:center;gap:.7rem}
+.game-badge{background:var(--yellow);color:#7A5500;font-size:12px;font-weight:900;padding:6px 20px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase}
+.welcome-title{font-size:clamp(2.4rem,7vw,3.8rem);color:#1A3D5C;line-height:1.05;margin:.1rem 0}
+.welcome-sub{font-size:1.05rem;color:#2E6A8C;max-width:440px;line-height:1.6;font-weight:600}
+.feature-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:.3rem}
+.feat{background:rgba(255,255,255,.72);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.9);border-radius:99px;padding:7px 16px;font-size:12px;font-weight:800;color:#1A3D5C}
+.btn-start{margin-top:.8rem;padding:16px 50px;font-size:1.3rem;font-family:'Fredoka One',cursive;background:linear-gradient(135deg,#E74C3C,#FF6B6B);color:#fff;border:none;border-radius:99px;cursor:pointer;box-shadow:0 7px 26px rgba(231,76,60,.42);transition:transform .18s,box-shadow .18s}
+.btn-start:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 12px 34px rgba(231,76,60,.5)}
+
+/* ── CITY ── */
+#screen-city{min-height:100vh;display:flex;flex-direction:column}
+.city-header{background:linear-gradient(90deg,#2C3E50,#4A6FA5);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.city-canvas-wrap{background:linear-gradient(180deg,#5DADE2 0%,#85C1E9 32%,#D6EAF8 66%,#7EC850 66%,#5AAA30 100%);flex-shrink:0}
+.city-bottom{flex:1;background:#fff;border-top:3px solid var(--yellow);padding:16px 18px;overflow-y:auto}
+.mission-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+.m-card{background:var(--bg);border:2px solid transparent;border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.m-card.avail{border-color:var(--yellow);background:#FFFBF0}
+.m-card.avail:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.m-card.done{border-color:var(--green);background:#F0FFF4;cursor:default}
+.m-card.done:hover{transform:none}
+.m-icon{font-size:1.7rem;margin-bottom:4px}
+.m-name{font-size:12px;font-weight:800}
+.m-status{font-size:11px;color:var(--muted);margin-top:2px}
+.m-check{position:absolute;top:6px;right:7px;width:19px;height:19px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900}
+.score-chips{display:flex;gap:8px;flex-wrap:wrap}
+.schip{background:rgba(255,255,255,.18);color:#fff;font-size:11px;font-weight:800;padding:5px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,.3)}
+/* style tracker */
+.style-tracker{margin-top:14px;background:linear-gradient(135deg,#F8F4FF,#F0FFFD);border-radius:16px;padding:14px 16px;border:2px solid #E8DFFF}
+.style-tracker h4{font-size:12px;font-weight:900;color:#5C4A8A;margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em}
+.sbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.sbar-lbl{font-size:12px;font-weight:700;width:78px;flex-shrink:0}
+.sbar-track{flex:1;height:10px;background:rgba(0,0,0,.07);border-radius:99px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.sbar-n{font-size:12px;font-weight:800;color:var(--muted);width:18px;text-align:right}
+
+/* ── MISSION MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{background:#fff;width:100%;max-width:700px;border-radius:24px 24px 0 0;padding:22px 20px 32px;max-height:92vh;overflow-y:auto;animation:slideUp .35s cubic-bezier(.34,1.2,.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:5px;background:#E0E0E0;border-radius:99px;margin:0 auto 16px}
+.modal-hdr{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.modal-big-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;flex-shrink:0}
+.modal-mission-title{font-size:1.45rem}
+.modal-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.paths-label{font-size:12px;font-weight:900;color:#636E72;text-transform:uppercase;letter-spacing:.07em;margin-bottom:11px}
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.path-btn{border-radius:18px;padding:14px 12px;border:2px solid transparent;cursor:pointer;text-align:left;transition:all .18s}
+.path-btn:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.pb-icon{font-size:1.8rem;margin-bottom:6px;display:block}
+.pb-name{font-family:'Fredoka One',cursive;font-size:1.05rem;display:block;margin-bottom:2px}
+.pb-desc{font-size:11px;opacity:.82;line-height:1.4}
+.pb-V{background:#F3F0FF;border-color:#C7BDFF;color:#5C3DBB}
+.pb-A{background:#FFF9ED;border-color:#FFE4A0;color:#8A6000}
+.pb-K{background:#F0FFF4;border-color:#A8E6B0;color:#1B6B30}
+.pb-R{background:#FFF5F5;border-color:#FFBFBF;color:#A82020}
+.btn-close-modal{display:block;margin:18px auto 0;background:none;border:2px solid #E0E0E0;color:var(--muted);font-size:13px;font-weight:700;padding:9px 30px;border-radius:99px;cursor:pointer;transition:all .15s}
+.btn-close-modal:hover{background:#F5F5F5}
+
+/* ── ACTIVITY SCREEN ── */
+#screen-activity{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+.act-header{padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:2px solid rgba(0,0,0,.06);background:#fff;flex-wrap:wrap}
+.path-badge{font-size:11px;font-weight:900;padding:5px 13px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+.act-title{font-size:1.15rem;color:var(--text)}
+.act-body{flex:1;padding:16px 18px;overflow-y:auto}
+.act-content{border-radius:18px;padding:18px;border:2px solid rgba(0,0,0,.05);margin-bottom:18px}
+.act-phase-label{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;opacity:.7}
+
+/* Visual activity */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.zone-card{border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;border:3px solid transparent}
+.zone-card:hover{transform:scale(1.03)}
+.zone-card.selected{border-color:#2D3436;box-shadow:0 0 0 3px rgba(45,52,54,.25)}
+.zone-card.correct{border-color:#27AE60!important;background:#D5F5E3!important}
+.zone-card.wrong{border-color:#E74C3C!important;background:#FDEDEC!important;animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.zc-icon{font-size:1.6rem;margin-bottom:5px}
+.zc-name{font-weight:800;font-size:13px;display:block;margin-bottom:3px}
+.zc-desc{font-size:11px;opacity:.8;line-height:1.4}
+.vis-stat-row{display:flex;justify-content:space-around;margin-top:12px;flex-wrap:wrap;gap:8px}
+.vis-stat{text-align:center;padding:9px 14px;border-radius:12px;background:rgba(255,255,255,.7)}
+.vs-num{font-family:'Fredoka One',cursive;font-size:1.4rem;display:block}
+.vs-lbl{font-size:10px;color:var(--muted)}
+
+/* Audio player */
+.podcast-wrap{background:#1C2340;border-radius:18px;overflow:hidden;margin-bottom:14px}
+.pod-topbar{background:linear-gradient(90deg,#2C3E6A,#1C2340);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.pod-art{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.pod-meta{flex:1}.pod-show{color:#8BA0C8;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.pod-ep{color:#fff;font-size:14px;font-weight:800;margin-top:2px}
+.pod-controls{padding:12px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.07)}
+.btn-play{width:44px;height:44px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:all .15s;flex-shrink:0}
+.btn-play:hover{transform:scale(1.08)}
+.pod-progress-wrap{flex:1}
+.pod-progress-bar{height:6px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin-bottom:5px}
+.pod-progress-fill{height:100%;border-radius:99px;width:0%;transition:width .4s linear}
+.pod-time{font-size:11px;color:rgba(255,255,255,.5);display:flex;justify-content:space-between}
+.btn-stop{background:none;border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:6px 14px;border-radius:99px;cursor:pointer;font-size:12px;font-weight:700;transition:all .15s}
+.btn-stop:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.transcript-area{padding:14px 16px;max-height:220px;overflow-y:auto}
+.transcript-line{display:flex;gap:10px;padding:8px 10px;border-radius:12px;margin-bottom:6px;transition:background .3s;opacity:.55;font-size:13px}
+.transcript-line.active{background:rgba(255,255,255,.1);opacity:1}
+.tl-speaker{font-weight:900;min-width:62px;flex-shrink:0;font-size:11px;padding-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.tl-text{color:#E0E8FF;line-height:1.55}
+.tts-note{font-size:11px;color:rgba(255,255,255,.35);padding:8px 16px 12px;text-align:center}
+
+/* Kinesthetic */
+.kine-scenario{border-radius:14px;padding:14px;margin-bottom:12px;border:2px solid}
+.kine-scenario h4{font-size:14px;font-weight:800;margin-bottom:8px}
+.kine-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kc-btn{border-radius:12px;padding:11px 12px;border:2px solid;cursor:pointer;font-size:12px;font-weight:700;text-align:left;transition:all .18s;line-height:1.4;background:#fff}
+.kc-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,.1)}
+.kc-btn.picked-correct{background:#D5F5E3!important;border-color:#27AE60!important;color:#1B5E20!important}
+.kc-btn.picked-wrong{background:#FDEDEC!important;border-color:#E74C3C!important;color:#7B241C!important;animation:shake .35s}
+.kc-btn:disabled{cursor:default}
+.kine-feedback{border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;margin-top:10px;display:none}
+.kine-feedback.show{display:block}
+.kine-progress{height:8px;background:#E0E0E0;border-radius:99px;overflow:hidden;margin-bottom:14px}
+.kine-prog-fill{height:100%;border-radius:99px;transition:width .4s}
+
+/* Read/Write */
+.doc-wrap{border-radius:14px;overflow:hidden;border:2px solid}
+.doc-header{padding:12px 16px;border-bottom:2px solid rgba(0,0,0,.08)}
+.doc-body{padding:14px 16px;background:#fff}
+.doc-section h4{font-size:13px;font-weight:900;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.doc-ul{padding-left:16px;margin-bottom:12px}
+.doc-ul li{font-size:13px;line-height:1.7;color:#444}
+.doc-callout{border-left:4px solid;padding:10px 14px;font-size:13px;font-style:italic;border-radius:0 10px 10px 0;line-height:1.6;margin:12px 0}
+.doc-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.doc-table th{padding:7px 10px;text-align:left;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.doc-table td{padding:7px 10px;border-top:1px solid rgba(0,0,0,.06)}
+.doc-table tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+
+/* ── QUIZ SECTION ── */
+.quiz-section{background:#fff;border-radius:20px;padding:18px;border:2.5px solid var(--yellow);margin-bottom:16px}
+.quiz-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.quiz-badge{background:var(--yellow);color:#7A5500;font-size:11px;font-weight:900;padding:5px 14px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+.quiz-instruction{font-size:13px;color:var(--muted);font-weight:600}
+.q-item{margin-bottom:18px}
+.q-text{font-size:14px;font-weight:800;color:var(--text);margin-bottom:10px;line-height:1.5}
+.q-num{color:var(--blue);font-family:'Fredoka One',cursive;font-size:1rem;margin-right:4px}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.q-opt{border:2px solid #E8E8E8;border-radius:11px;padding:10px 12px;cursor:pointer;font-size:13px;font-weight:600;text-align:left;background:#FAFAFA;transition:all .15s;line-height:1.4}
+.q-opt:hover:not(:disabled){border-color:#A0ADB8;background:#F0F4F8}
+.q-opt.selected{border-color:var(--blue);background:#EBF5FF;color:#1A5276;font-weight:800}
+.q-opt.ans-correct{border-color:#27AE60!important;background:#D5F5E3!important;color:#1B5E20!important}
+.q-opt.ans-wrong{border-color:#E74C3C!important;background:#FDEDEC!important;color:#7B241C!important}
+.q-opt.ans-reveal{border-color:#27AE60!important;background:rgba(39,174,96,.08)!important;color:#1B5E20!important;font-weight:800}
+.q-opt:disabled{cursor:default}
+.quiz-submit-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px}
+.btn-submit-quiz{padding:12px 32px;font-family:'Fredoka One',cursive;font-size:1.1rem;border:none;border-radius:12px;cursor:pointer;transition:all .18s;background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(91,143,249,.4)}
+.btn-submit-quiz:disabled{background:#C0C0C0;box-shadow:none;cursor:not-allowed}
+.btn-submit-quiz:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(91,143,249,.5)}
+.quiz-result-msg{font-size:14px;font-weight:800;padding:10px 16px;border-radius:12px;text-align:center}
+.qr-pass{background:#D5F5E3;color:#1B5E20;border:1.5px solid #A9DFBF}
+.qr-fail{background:#FDEDEC;color:#7B241C;border:1.5px solid #F5B7B1}
+.btn-retry-quiz{padding:10px 24px;font-weight:800;font-size:13px;border-radius:99px;border:2px solid #E74C3C;color:#E74C3C;background:none;cursor:pointer;transition:all .15s}
+.btn-retry-quiz:hover{background:#FDEDEC}
+
+/* Build button */
+.build-bar{padding:0 18px 28px;text-align:center}
+.btn-build{width:100%;max-width:380px;padding:17px;font-family:'Fredoka One',cursive;font-size:1.3rem;background:linear-gradient(135deg,#27AE60,#2ECC71);color:#fff;border:none;border-radius:18px;cursor:pointer;box-shadow:0 6px 22px rgba(39,174,96,.45);transition:all .2s}
+.btn-build:hover{transform:translateY(-3px) scale(1.02)}
+.btn-build:disabled{background:linear-gradient(135deg,#BDC3C7,#95A5A6);box-shadow:none;cursor:not-allowed;transform:none}
+.build-hint{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700}
+
+/* ── BUILT ── */
+#screen-built{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 50%,#FFF8EC 100%)}
+@keyframes popIn{from{transform:scale(0) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.built-emoji{font-size:4.5rem;animation:popIn .5s cubic-bezier(.34,1.7,.64,1)}
+.built-score-reveal{background:#fff;border-radius:18px;padding:14px 22px;margin:1rem 0;box-shadow:var(--shadow);display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.bsr-stat{text-align:center}.bsr-num{font-family:'Fredoka One',cursive;font-size:2rem;display:block}
+.bsr-lbl{font-size:12px;color:var(--muted);font-weight:700}
+.btn-continue{margin-top:1.2rem;padding:14px 44px;font-family:'Fredoka One',cursive;font-size:1.2rem;background:var(--blue);color:#fff;border:none;border-radius:99px;cursor:pointer;box-shadow:0 5px 18px rgba(91,143,249,.4);transition:all .18s}
+.btn-continue:hover{transform:translateY(-2px)}
+
+/* ── RESULTS ── */
+#screen-results{min-height:100vh;background:linear-gradient(180deg,#F3EFFF 0%,#FFF8EC 40%)}
+.results-hero{background:linear-gradient(135deg,#2C3E50,#4A6FA5);padding:30px 20px 26px;text-align:center;color:#fff;overflow:hidden;position:relative}
+.results-hero::before{content:'🌟';font-size:7rem;position:absolute;opacity:.07;top:-5px;right:-5px;animation:spin 8s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.results-body{padding:18px}
+.dominant-card{border-radius:22px;padding:22px 18px;text-align:center;margin-bottom:18px;position:relative;overflow:hidden}
+.dominant-card::before{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1);top:-50px;right:-30px}
+.dom-emoji{font-size:3.2rem;margin-bottom:6px}
+.dom-title{font-size:1.75rem;color:#fff;margin-bottom:5px}
+.dom-desc{font-size:14px;color:rgba(255,255,255,.9);line-height:1.6;max-width:380px;margin:0 auto}
+.accuracy-banner{background:#fff;border-radius:16px;padding:14px;box-shadow:var(--shadow);display:flex;justify-content:space-around;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.acc-stat{text-align:center}.acc-num{font-family:'Fredoka One',cursive;font-size:1.8rem;display:block}.acc-lbl{font-size:12px;color:var(--muted);font-weight:700}
+.breakdown-title{font-size:12px;font-weight:900;color:#636E72;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.rbc{background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:9px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.rbc-icon{font-size:1.4rem;width:32px;text-align:center;flex-shrink:0}
+.rbc-info{flex:1}.rbc-name{font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px}
+.rbc-track{height:9px;background:#F0F0F0;border-radius:99px;overflow:hidden;margin-top:5px}
+.rbc-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.34,1.2,.64,1)}
+.rbc-pct{font-size:13px;font-weight:800;min-width:34px;text-align:right;flex-shrink:0}
+.tips-card{background:#fff;border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px}
+.tip-pill{display:inline-block;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:700;margin:4px 4px 4px 0;line-height:1.4}
+.btn-restart{width:100%;padding:15px;font-family:'Fredoka One',cursive;font-size:1.2rem;background:linear-gradient(135deg,#E74C3C,#FF6B6B);color:#fff;border:none;border-radius:14px;cursor:pointer;box-shadow:0 5px 18px rgba(231,76,60,.38);transition:all .18s}
+.btn-restart:hover{transform:translateY(-2px)}
+/* StreamElements badge */
+.tts-badge{background:#0F1629;border-radius:0 0 14px 14px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:#6BCB77}
+.tts-badge-dot{width:7px;height:7px;background:#6BCB77;border-radius:50%;flex-shrink:0;animation:pulse-dot 2s ease-in-out infinite}
+.tts-badge-info{color:rgba(255,255,255,.35);font-weight:600;font-size:11px;margin-left:auto}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+/* confetti */
+#confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+/* misc */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14);border-radius:99px}
+@keyframes buildBounce{0%{transform:scaleY(0) translateY(10px);opacity:0}55%{transform:scaleY(1.08) translateY(-6px);opacity:1}75%{transform:scaleY(.96) translateY(2px)}100%{transform:scaleY(1) translateY(0);opacity:1}}
+.build-enter{animation:buildBounce .7s cubic-bezier(.34,1.56,.64,1) forwards;transform-origin:bottom center}
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<div id="app"></div>
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const MISSIONS=[
+  {id:'library',name:'City Library',icon:'📚',color:'#5B8FF9',dark:'#2952C8',tag:'A knowledge hub for every citizen',desc:'The city needs a public library that serves diverse learners — from digital natives to deep readers. As Learning Director, your job is to understand research-backed design principles and make the right decisions.',cityX:14,cityY:180,cityW:110},
+  {id:'hospital',name:'City Hospital',icon:'🏥',color:'#4ECDC4',dark:'#2A9D8F',tag:'Health & wellness for all residents',desc:'As Hospital Planner, you must understand how design, workflow, and patient-centred principles directly impact clinical outcomes. Real decisions, real consequences.',cityX:148,cityY:175,cityW:105},
+  {id:'school',name:'Community School',icon:'🎓',color:'#F39C12',dark:'#D68910',tag:'Shape the next generation of learners',desc:'You are the School Design Consultant. Evidence shows the physical environment accounts for up to 25% of student progress. You need to get the design right — and defend your choices.',cityX:276,cityY:178,cityW:108},
+  {id:'park',name:'City Park',icon:'🌳',color:'#27AE60',dark:'#1E8449',tag:'Green infrastructure for urban wellbeing',desc:'Urban green space is now a public health intervention. As Parks Commissioner, you must understand the evidence and apply it — not just pick what looks nice.',cityX:408,cityY:185,cityW:95},
+  {id:'townhall',name:'Town Hall',icon:'🏛️',color:'#E74C3C',dark:'#C0392B',tag:'The centre of civic life & democracy',desc:'The Town Hall must serve competing masters: authority and accessibility, grandeur and welcome. You are the Civic Architect. Understand the principles before you build.',cityX:527,cityY:170,cityW:115}
+];
+const PATHS=[
+  {id:'V',name:'Visual Learner',short:'Visual',icon:'🎨',desc:'Diagrams, charts & visual structure',color:'#A29BFE',bg:'#F3F0FF',border:'#C7BDFF',text:'#5C3DBB'},
+  {id:'A',name:'Auditory Learner',short:'Auditory',icon:'🎧',desc:'Listening, discussion & storytelling',color:'#F39C12',bg:'#FFF9ED',border:'#FFE4A0',text:'#8A6000'},
+  {id:'K',name:'Kinesthetic Learner',short:'Hands-On',icon:'🧪',desc:'Experimenting, deciding & building',color:'#27AE60',bg:'#F0FFF4',border:'#A8E6B0',text:'#1B6B30'},
+  {id:'R',name:'Read/Write Learner',short:'Read/Write',icon:'📝',desc:'Texts, notes & written frameworks',color:'#E74C3C',bg:'#FFF5F5',border:'#FFBFBF',text:'#A82020'},
+];
+const STYLE_DESC={
+  V:'You grasp complex ideas best when presented visually — through diagrams, flow charts, spatial layouts and colour-coded structures. You naturally sketch out mental models and think in pictures.',
+  A:'You learn most effectively through listening and verbal reasoning. Lectures, discussions, podcasts and talking through problems help information stick. You often learn by explaining to others.',
+  K:'You are a learn-by-doing person. Hands-on scenarios, real decision-making, trial-and-error and physical interaction with content help you understand and retain deeply.',
+  R:'You thrive through text. Reading structured materials, annotating, writing summaries and working with lists and frameworks are your natural routes to mastery.',
+};
+const STYLE_TIPS={
+  V:['Use mind maps & colour-coded notes','Draw diagrams before reading text','Watch explainer videos first','Organise information as flowcharts'],
+  A:['Record voice notes to review later','Join study discussion groups','Listen to podcasts on your topic','Talk through problems with peers'],
+  K:['Try before reading the manual','Use case studies & simulations','Take reflective breaks mid-task','Build prototypes and test them'],
+  R:['Take detailed written notes','Rewrite ideas in your own words','Use numbered lists and checklists','Summarise sections before moving on'],
+};
+
+// ═══════════════════════════════════════════════════════
+// ACTIVITY CONTENT
+// ═══════════════════════════════════════════════════════
+function getActivityContent(mId, pId){
+  const c = CONTENT[mId][pId];
+  return c;
+}
+
+const CONTENT = {
+library:{
+  V:{
+    render:()=>`
+    <div class="act-content" style="background:#F3F0FF;border-color:#C7BDFF">
+      <div class="act-phase-label" style="color:#5C3DBB">📊 Study this infographic — then answer the knowledge check below</div>
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#5C3DBB;margin-bottom:12px">Modern Public Library — Zone Design Framework</h4>
+      <div class="zone-grid">
+        <div class="zone-card" style="background:#5B8FF9;color:#fff"><div class="zc-icon">📖</div><span class="zc-name">Quiet Study Zone</span><span class="zc-desc">Natural-light reading rooms. Noise levels ≤35dB. Individual carrels + soft seating. <strong>Primary function: deep focus.</strong></span></div>
+        <div class="zone-card" style="background:#A29BFE;color:#fff"><div class="zc-icon">💻</div><span class="zc-name">Digital Resource Hub</span><span class="zc-desc">Computers, e-journals & multimedia. Research shows this drives 40% of all visits. <strong>Key driver of modern library use.</strong></span></div>
+        <div class="zone-card" style="background:#4ECDC4;color:#fff"><div class="zc-icon">🤝</div><span class="zc-name">Collaborative Spaces</span><span class="zc-desc">Group study rooms, maker labs, café. Studies show community zones <strong>double repeat visits</strong> vs. book-only libraries.</span></div>
+        <div class="zone-card" style="background:#6BCB77;color:#fff"><div class="zc-icon">📅</div><span class="zc-name">Programme & Events</span><span class="zc-desc">Talks, workshops, digital literacy classes. <strong>Programmed events create habitual users</strong> — key to long-term civic value.</span></div>
+      </div>
+      <div class="vis-stat-row">
+        <div class="vis-stat"><span class="vs-num" style="color:#5B8FF9">2×</span><span class="vs-lbl">Visit increase with social spaces</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#A29BFE">40%</span><span class="vs-lbl">Visits driven by digital hub</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#4ECDC4">≤35dB</span><span class="vs-lbl">Target noise for study zones</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#6BCB77">25%↑</span><span class="vs-lbl">Satisfaction via programming</span></div>
+      </div>
+    </div>`
+  },
+  A:{
+    render:()=>`
+    <div class="act-content" style="background:#1C2340;border-color:#2C3E6A;padding:0">
+      <div class="podcast-wrap">
+        <div class="pod-topbar">
+          <div class="pod-art" style="background:#5B8FF9">📚</div>
+          <div class="pod-meta">
+            <div class="pod-show">City Talks Podcast · Ep 12</div>
+            <div class="pod-ep">The Evidence-Based Library: What Actually Works?</div>
+          </div>
+        </div>
+        <div class="pod-controls">
+          <button class="btn-play" id="btn-play" onclick="toggleAudio()" style="background:#5B8FF9;color:#fff">▶</button>
+          <div class="pod-progress-wrap">
+            <div class="pod-progress-bar"><div class="pod-progress-fill" id="pod-prog" style="background:#5B8FF9"></div></div>
+            <div class="pod-time"><span id="pod-time-cur">0:00</span><span id="pod-time-tot">—</span></div>
+          </div>
+          <button class="btn-stop" onclick="stopAudio()">■ Stop</button>
+        </div>
+        <div class="transcript-area" id="transcript-area"></div>
+        <div class="tts-note">🔊 Uses your browser's text-to-speech — enable audio for full experience</div>
+      </div>
+    </div>`,
+    audio:[
+      {speaker:'HOST',color:'#7BAEFF',text:'Welcome to City Talks. Today we are asking a serious question: what does the research actually say makes a public library succeed or fail in 2024?'},
+      {speaker:'DR. PATEL',color:'#FFD93D',text:'The evidence is very clear, and it surprises a lot of council planners. The number of books you hold is almost irrelevant. What matters is whether the library functions as a genuine community hub.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'And what defines a community hub in this context?'},
+      {speaker:'DR. PATEL',color:'#FFD93D',text:'Three things. First, a mix of quiet and social zones — you need both, not one or the other. Second, a strong digital resource offer, which now drives roughly 40 percent of all visits. Third, an active programme of events and workshops.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'So programming is as important as the physical design?'},
+      {speaker:'DR. PATEL',color:'#FFD93D',text:'Absolutely. Libraries that run regular events create habitual users — people who come weekly rather than occasionally. That is what creates long-term civic value. Bricks and mortar alone will not do it.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What is the single biggest mistake you see in new library designs?'},
+      {speaker:'DR. PATEL',color:'#FFD93D',text:'Prioritising storage over interaction. Beautiful rows of shelves, but nowhere comfortable to sit, no café, no group rooms. The data shows those libraries underperform by every metric we measure.'},
+    ]
+  },
+  K:{
+    render:()=>`
+    <div class="act-content" style="background:#F0FFF4;border-color:#A8E6B0">
+      <div class="act-phase-label" style="color:#1B6B30">🧪 Make real decisions — choose the best option for each scenario</div>
+      <div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,#27AE60,#2ECC71);width:0%"></div></div>
+      <div id="kine-scenarios"></div>
+    </div>`,
+    scenarios:[
+      {q:'The library has a tight budget. The architect suggests cutting the group study rooms to save costs. What do you recommend?',opts:['Cut the group rooms — individual study is the core function','Reduce the book collection instead — community spaces drive visits','Cut the digital hub — paper is more durable','Reduce opening hours to fund all zones'],correct:1,feedback:'Correct. Research consistently shows community spaces drive repeat visits and overall usage far more than collection size.'},
+      {q:'Noise complaints from study users are rising. The café and collaboration zone are blamed. What is your response?',opts:['Relocate the café and collaboration zone to a separate wing or floor','Remove the café entirely — libraries should be quiet','Close collaboration rooms during peak study hours','Introduce a strict no-talking rule throughout'],correct:0,feedback:'Correct. Zoning — not elimination — is the evidence-based response. You need both quiet AND social spaces, just separated.'},
+      {q:'Library usage data shows the digital resource hub accounts for 40% of all visits. Budget cuts are proposed. What do you protect?',opts:['Cut digital access — it is a luxury not a core service','Protect digital access absolutely — it is the largest usage driver','Reduce digital to 20% of the space to restore shelf space','Replace digital terminals with self-checkout kiosks'],correct:1,feedback:'Correct. With 40% of visits driven by digital access, cutting it would devastate footfall. Evidence always wins over tradition.'},
+    ]
+  },
+  R:{
+    render:()=>`
+    <div class="act-content" style="background:#FFF5F5;border-color:#FFBFBF;padding:0">
+      <div class="doc-wrap" style="border-color:#FFBFBF">
+        <div class="doc-header" style="background:#FFF5F5;border-color:#FFBFBF">
+          <div style="font-size:11px;font-weight:900;color:#A82020;text-transform:uppercase;letter-spacing:.06em">City Planning Authority · Evidence Brief #12</div>
+          <div style="font-size:1rem;font-weight:800;color:#2D3436;margin-top:3px">Public Library Design: What the Research Shows</div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-section">
+            <h4 style="color:#A82020">📌 Key Findings (IFLA / UCL Library Studies, 2023)</h4>
+            <ul class="doc-ul">
+              <li>Libraries with active social zones record <strong>2× higher repeat visit rates</strong> than book-only counterparts</li>
+              <li>Digital resource hubs now generate approximately <strong>40% of all library visits</strong> across OECD cities</li>
+              <li>Noise levels above <strong>45dB in study areas correlate with a 31% reduction</strong> in time-on-task</li>
+              <li>Libraries running ≥3 community events/week show <strong>25% higher citizen satisfaction scores</strong></li>
+            </ul>
+          </div>
+          <div class="doc-callout" style="border-color:#E74C3C;color:#7A2020;background:#FFF0F0">"A public library achieves civic value not through its collection size, but through the quality of interaction it enables. The community function is now inseparable from the learning function." — IFLA Standards Review, 2023</div>
+          <div class="doc-section">
+            <h4 style="color:#A82020">📊 Performance Benchmarks</h4>
+            <table class="doc-table">
+              <tr><th style="background:#FFEBEE">Metric</th><th style="background:#FFEBEE">Minimum Standard</th><th style="background:#FFEBEE">Best-in-Class</th></tr>
+              <tr><td>Weekly active users per 1,000 residents</td><td>80</td><td>200+</td></tr>
+              <tr><td>Events programmed per month</td><td>8</td><td>25+</td></tr>
+              <tr><td>Digital terminal utilisation rate</td><td>60%</td><td>85%+</td></tr>
+              <tr><td>Citizen satisfaction score</td><td>72%</td><td>90%+</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`
+  }
+},
+hospital:{
+  V:{render:()=>`
+    <div class="act-content" style="background:#E0FFFE;border-color:#80E5DF">
+      <div class="act-phase-label" style="color:#2A9D8F">📊 Study this clinical layout framework — pay attention to the evidence</div>
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#2A9D8F;margin-bottom:12px">Hospital Design — Evidence-Based Framework</h4>
+      <div class="zone-grid">
+        <div class="zone-card" style="background:#E74C3C;color:#fff"><div class="zc-icon">🚨</div><span class="zc-name">Emergency & Triage</span><span class="zc-desc">Ground floor, ambulance access. Every 10m of extra patient travel adds measurable delay. <strong>Location is clinical, not aesthetic.</strong></span></div>
+        <div class="zone-card" style="background:#3498DB;color:#fff"><div class="zc-icon">🔬</div><span class="zc-name">Diagnostics (Adj. to A&E)</span><span class="zc-desc">Imaging & labs must be adjacent to Emergency. <strong>Proximity reduces result turnaround by 40%</strong> vs. separated layouts.</span></div>
+        <div class="zone-card" style="background:#2ECC71;color:#fff"><div class="zc-icon">🛏️</div><span class="zc-name">Single-Occupancy Wards</span><span class="zc-desc">Proven to reduce healthcare-acquired infections by <strong>up to 40%</strong>. Natural light on wards accelerates recovery by measurable margins.</span></div>
+        <div class="zone-card" style="background:#9B59B6;color:#fff"><div class="zc-icon">💊</div><span class="zc-name">Outpatient & Rehabilitation</span><span class="zc-desc">Separate entrance to reduce A&E congestion. <strong>Decoupling routine from emergency care</strong> is the most impactful operational decision.</span></div>
+      </div>
+      <div class="vis-stat-row">
+        <div class="vis-stat"><span class="vs-num" style="color:#E74C3C">40%</span><span class="vs-lbl">Faster lab results, adj. layout</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#2ECC71">40%↓</span><span class="vs-lbl">Infection rate, single rooms</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#3498DB">6.8%</span><span class="vs-lbl">Faster recovery w/ daylight</span></div>
+      </div>
+    </div>`},
+  A:{render:()=>`
+    <div class="act-content" style="background:#1C2340;border-color:#2C3E6A;padding:0">
+      <div class="podcast-wrap">
+        <div class="pod-topbar">
+          <div class="pod-art" style="background:#4ECDC4">🏥</div>
+          <div class="pod-meta">
+            <div class="pod-show">Health by Design · Ep 7</div>
+            <div class="pod-ep">When Hospital Architecture Saves Lives</div>
+          </div>
+        </div>
+        <div class="pod-controls">
+          <button class="btn-play" id="btn-play" onclick="toggleAudio()" style="background:#4ECDC4;color:#fff">▶</button>
+          <div class="pod-progress-wrap">
+            <div class="pod-progress-bar"><div class="pod-progress-fill" id="pod-prog" style="background:#4ECDC4"></div></div>
+            <div class="pod-time"><span id="pod-time-cur">0:00</span><span id="pod-time-tot">—</span></div>
+          </div>
+          <button class="btn-stop" onclick="stopAudio()">■ Stop</button>
+        </div>
+        <div class="transcript-area" id="transcript-area"></div>
+        <div class="tts-note">🔊 Uses your browser's text-to-speech — enable audio for full experience</div>
+      </div>
+    </div>`,
+    audio:[
+      {speaker:'HOST',color:'#7BAEFF',text:'Hospital design is a matter of life and death. Literally. Today we are looking at the design choices that the evidence shows directly affect patient outcomes.'},
+      {speaker:'DR. CHEN',color:'#4ECDC4',text:'The most important concept is clinical adjacency. Emergency, diagnostics, and critical care must be physically adjacent. Every unnecessary metre between them adds delay, and delay in acute medicine costs lives.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What about the single-room debate? Some planners argue open wards are more efficient.'},
+      {speaker:'DR. CHEN',color:'#4ECDC4',text:'The evidence is unambiguous. Single-occupancy rooms reduce healthcare-acquired infections by up to 40 percent. That is not a preference — that is a clinical outcome. Any planner arguing against single rooms on efficiency grounds is not reading the literature.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'You have strong views on natural light as well?'},
+      {speaker:'DR. CHEN',color:'#4ECDC4',text:'Studies consistently show patients in naturally lit wards have measurably shorter recovery times. 6 to 7 percent faster on average. Staff working in naturally lit environments also show lower burnout rates. The evidence is overwhelming and yet many hospitals are still being designed without it.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What is the single most impactful operational decision a planner can make?'},
+      {speaker:'DR. CHEN',color:'#4ECDC4',text:'Decouple routine outpatient care from emergency pathways. Give them separate entrances, separate flows. Nothing chokes an A and E faster than a patient who could have been seen in outpatient joining the emergency queue.'},
+    ]},
+  K:{render:()=>`
+    <div class="act-content" style="background:#E0FFFE;border-color:#80E5DF">
+      <div class="act-phase-label" style="color:#2A9D8F">🧪 Critical decisions — each has real clinical consequences</div>
+      <div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,#4ECDC4,#27AE60);width:0%"></div></div>
+      <div id="kine-scenarios"></div>
+    </div>`,
+    scenarios:[
+      {q:'Budget pressure means choosing between single-occupancy rooms or a larger open ward with more beds. What do you recommend to the board?',opts:['Open ward — more beds means more capacity','Single rooms — 40% infection reduction is non-negotiable','Shared twin rooms as a compromise','Defer the decision to the clinical director'],correct:1,feedback:'Correct. The evidence on infection rates is decisive. Single rooms save more money long-term through reduced HAI costs than the short-term capacity gain from open wards.'},
+      {q:'The architect places diagnostics (imaging, labs) on the 3rd floor, separate from A&E on the ground floor. You review the plan. What do you do?',opts:['Approve it — the aesthetics work well','Request diagnostics be relocated adjacent to A&E on the ground floor','Add a fast-track lift to compensate','Have the A&E moved to the 3rd floor instead'],correct:1,feedback:'Correct. Clinical adjacency is a patient safety issue. 40% faster result turnaround with adjacent layouts is a critical outcome that overrides any aesthetic or space-efficiency argument.'},
+      {q:'A ward design shows internal rooms with no external windows. The lead nurse raises concerns. How do you respond?',opts:['Override the concern — artificial lighting is equivalent','Support the nurse — mandate natural light on all wards','Install skylights as a compromise','Commission a year-long study before deciding'],correct:1,feedback:'Correct. Natural light produces measurable recovery benefits. The clinical evidence, combined with staff wellbeing research, means this should be a non-negotiable design standard.'},
+    ]},
+  R:{render:()=>`
+    <div class="act-content" style="background:#FFF5F5;border-color:#FFBFBF;padding:0">
+      <div class="doc-wrap" style="border-color:#80E5DF">
+        <div class="doc-header" style="background:#E0FFFE;border-color:#80E5DF">
+          <div style="font-size:11px;font-weight:900;color:#2A9D8F;text-transform:uppercase;letter-spacing:.06em">Ministry of Health · Design Evidence Review</div>
+          <div style="font-size:1rem;font-weight:800;color:#2D3436;margin-top:3px">Hospital Design Standards: Clinical Evidence Summary</div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-section"><h4 style="color:#2A9D8F">🏥 Evidence-Based Design Principles</h4>
+            <ul class="doc-ul">
+              <li><strong>Clinical Adjacency:</strong> A&E, diagnostics and critical care co-located on one floor reduces result turnaround by ~40%</li>
+              <li><strong>Single-Occupancy Rooms:</strong> Reduce healthcare-acquired infections (HAI) by up to 40% — the strongest ROI in hospital design</li>
+              <li><strong>Natural Light:</strong> Ward patients recover 6–8% faster; staff burnout rates fall by 12% in naturally-lit environments</li>
+              <li><strong>Decoupled Pathways:</strong> Separate outpatient and emergency flows reduce A&E wait times by an average of 22%</li>
+            </ul>
+          </div>
+          <div class="doc-callout" style="border-color:#4ECDC4;color:#1A6B62;background:#E0FFFE">"Hospital design is not an aesthetic exercise. Every spatial decision carries a clinical consequence. Planners who ignore evidence-based design are accepting preventable patient harm." — NHS Design Quality Framework, 2023</div>
+          <div class="doc-section"><h4 style="color:#2A9D8F">📊 Key Performance Indicators</h4>
+            <table class="doc-table">
+              <tr><th style="background:#E0FFFE">Design Feature</th><th style="background:#E0FFFE">Evidence Outcome</th></tr>
+              <tr><td>A&E + diagnostics adjacency</td><td>40% faster test turnaround</td></tr>
+              <tr><td>Single-occupancy rooms</td><td>Up to 40% HAI reduction</td></tr>
+              <tr><td>Natural light in wards</td><td>6–8% faster recovery</td></tr>
+              <tr><td>Decoupled outpatient flow</td><td>22% A&E wait reduction</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`}
+},
+school:{
+  V:{render:()=>`
+    <div class="act-content" style="background:#FFFDE7;border-color:#FFE57F">
+      <div class="act-phase-label" style="color:#8A6000">📊 Evidence-based school design — every figure below is research-backed</div>
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#8A6000;margin-bottom:12px">Learning Environment Design — Evidence Framework</h4>
+      <div class="zone-grid">
+        <div class="zone-card" style="background:#F39C12;color:#fff"><div class="zc-icon">☀️</div><span class="zc-name">Natural Light & Air</span><span class="zc-desc">Linked to <strong>25% of Year-1 progress</strong> in Salford research. Daylit classrooms outperform artificial-only by every metric measured.</span></div>
+        <div class="zone-card" style="background:#E74C3C;color:#fff"><div class="zc-icon">🔄</div><span class="zc-name">Flexible Layouts</span><span class="zc-desc">Movable furniture enabling solo, pair, group and presentation modes. <strong>Fixed rows limit pedagogy</strong> — the space determines the teaching style.</span></div>
+        <div class="zone-card" style="background:#8E44AD;color:#fff"><div class="zc-icon">🌿</div><span class="zc-name">Biophilic Elements</span><span class="zc-desc">Plants, natural textures, outdoor views. <strong>Reduces cortisol, improves focus.</strong> Low cost, high evidence-based impact.</span></div>
+        <div class="zone-card" style="background:#2980B9;color:#fff"><div class="zc-icon">🔭</div><span class="zc-name">Specialist Labs</span><span class="zc-desc">STEM, arts, drama and maker spaces. Subject-specific environments <strong>raise engagement and attainment</strong> in those disciplines.</span></div>
+      </div>
+      <div class="vis-stat-row">
+        <div class="vis-stat"><span class="vs-num" style="color:#F39C12">25%</span><span class="vs-lbl">Progress linked to environment</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#E74C3C">16%↑</span><span class="vs-lbl">Attainment, flexible rooms</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#8E44AD">12%↓</span><span class="vs-lbl">Cortisol with biophilic design</span></div>
+      </div>
+    </div>`},
+  A:{render:()=>`
+    <div class="act-content" style="background:#1C2340;border-color:#2C3E6A;padding:0">
+      <div class="podcast-wrap">
+        <div class="pod-topbar">
+          <div class="pod-art" style="background:#F39C12">🎓</div>
+          <div class="pod-meta">
+            <div class="pod-show">EduDesign Podcast · Ep 19</div>
+            <div class="pod-ep">Does the Building Teach? Evidence on School Design</div>
+          </div>
+        </div>
+        <div class="pod-controls">
+          <button class="btn-play" id="btn-play" onclick="toggleAudio()" style="background:#F39C12;color:#fff">▶</button>
+          <div class="pod-progress-wrap">
+            <div class="pod-progress-bar"><div class="pod-progress-fill" id="pod-prog" style="background:#F39C12"></div></div>
+            <div class="pod-time"><span id="pod-time-cur">0:00</span><span id="pod-time-tot">—</span></div>
+          </div>
+          <button class="btn-stop" onclick="stopAudio()">■ Stop</button>
+        </div>
+        <div class="transcript-area" id="transcript-area"></div>
+        <div class="tts-note">🔊 Uses your browser's text-to-speech — enable audio for full experience</div>
+      </div>
+    </div>`,
+    audio:[
+      {speaker:'HOST',color:'#7BAEFF',text:'The University of Salford published research showing the physical environment accounts for up to 25 percent of student progress in year one. That is a remarkable finding. Can you put that into context?'},
+      {speaker:'PROF. YATES',color:'#F39C12',text:'It is remarkable, and frankly it should have reshaped every school commissioning brief since it was published. What it shows is that daylight, air quality, flexibility of space and what we call biophilic elements — connection to nature — are not aesthetic choices. They are pedagogical tools.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What is the biggest design mistake made in schools?'},
+      {speaker:'PROF. YATES',color:'#F39C12',text:'Fixed furniture in rows. The moment you bolt down furniture, you are telling teachers: you may only teach in one way. Learning requires solo work, paired work, group work, presentation and physical movement. If your space only supports one of those, you will underperform.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'And biophilic design — is there genuine evidence or is this design trend dressed up as science?'},
+      {speaker:'PROF. YATES',color:'#F39C12',text:'Genuine evidence. Plants and natural light in classrooms reduce cortisol by measurable percentages. Cortisol is the stress hormone. Less cortisol means better cognitive function. These are not soft benefits — they are physiological outcomes.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What should a school planner prioritise if budget is constrained?'},
+      {speaker:'PROF. YATES',color:'#F39C12',text:'Flexible furniture and maximum natural light. Both have the strongest evidence base, both are achievable even on tight budgets, and both transform a space without needing a specialist fit-out.'},
+    ]},
+  K:{render:()=>`
+    <div class="act-content" style="background:#FFFDE7;border-color:#FFE57F">
+      <div class="act-phase-label" style="color:#8A6000">🧪 Apply the evidence — what would you commission?</div>
+      <div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,#F39C12,#FFD93D);width:0%"></div></div>
+      <div id="kine-scenarios"></div>
+    </div>`,
+    scenarios:[
+      {q:'The project budget has been cut by 15%. The contractor suggests standardising all classrooms with fixed-row seating to save money. What is your response?',opts:['Accept — fixed seating is perfectly functional','Reject — flexible furniture is a high-evidence priority that cannot be sacrificed','Accept for primary classrooms but not secondary','Request a pilot of one room first'],correct:1,feedback:'Correct. Research shows flexible layouts increase attainment by ~16%. This is not an aesthetic preference — it is a documented pedagogical tool. Budget cuts elsewhere are more defensible.'},
+      {q:'The building design team wants to use artificially lit interior classrooms to maximise floor space. The Salford research is cited in opposition. What do you do?',opts:['Override — modern LED lighting is equivalent to daylight','Support — mandate natural light in all teaching spaces','Allow it only for specialist rooms like IT suites','Commission fresh research before deciding'],correct:1,feedback:'Correct. Natural light is linked to 25% of Year-1 progress in the Salford study. Artificial lighting does not replicate circadian rhythm benefits. This is a non-negotiable standard in evidence-based school design.'},
+      {q:'A parent group lobbies for removal of indoor plants and "nature features," calling them a distraction. The head teacher supports biophilic design. Who do you side with?',opts:['The parents — reduce distractions for learning','The head teacher — biophilic features reduce cortisol and improve focus','Compromise — plants only in corridors','Remove them and monitor attainment data'],correct:1,feedback:'Correct. Biophilic design has a physiological evidence base. Plants and natural connection reduce cortisol (the stress hormone) which directly improves cognitive performance. This is science, not décor.'},
+    ]},
+  R:{render:()=>`
+    <div class="act-content" style="background:transparent;border-color:transparent;padding:0">
+      <div class="doc-wrap" style="border-color:#FFE57F">
+        <div class="doc-header" style="background:#FFFDE7;border-color:#FFE57F">
+          <div style="font-size:11px;font-weight:900;color:#8A6000;text-transform:uppercase;letter-spacing:.06em">Dept. of Education · Evidence Review</div>
+          <div style="font-size:1rem;font-weight:800;color:#2D3436;margin-top:3px">School Design & Student Outcomes: What the Research Shows</div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-section"><h4 style="color:#8A6000">📚 Key Research Findings</h4>
+            <ul class="doc-ul">
+              <li><strong>University of Salford (2015, replicated 2022):</strong> Physical environment accounts for up to 25% of progress in Year 1</li>
+              <li><strong>Flexible Layouts:</strong> Classrooms supporting multiple modes of working show 16% higher attainment scores on average</li>
+              <li><strong>Biophilic Design:</strong> Plants and natural views reduce cortisol by 12–18% in school-age learners</li>
+              <li><strong>Natural light:</strong> Students in naturally lit rooms show higher sustained attention than those in artificial-only environments</li>
+            </ul>
+          </div>
+          <div class="doc-callout" style="border-color:#F39C12;color:#7A5000;background:#FFFDE7">"The quality of the school's built environment is not peripheral to educational outcomes — it is a direct variable in the equation. Planners who treat it as a finish rather than a foundation are reading the evidence wrong." — RIBA Education Design Report, 2022</div>
+          <div class="doc-section"><h4 style="color:#8A6000">📋 Commissioning Priorities (Evidence-Ranked)</h4>
+            <table class="doc-table">
+              <tr><th style="background:#FFF9C4">Priority</th><th style="background:#FFF9C4">Feature</th><th style="background:#FFF9C4">Evidence Strength</th></tr>
+              <tr><td>1</td><td>Natural light in all teaching spaces</td><td>⭐⭐⭐⭐⭐ Very Strong</td></tr>
+              <tr><td>2</td><td>Fully flexible furniture & layouts</td><td>⭐⭐⭐⭐⭐ Very Strong</td></tr>
+              <tr><td>3</td><td>Biophilic design elements</td><td>⭐⭐⭐⭐ Strong</td></tr>
+              <tr><td>4</td><td>Specialist STEM & arts labs</td><td>⭐⭐⭐ Moderate-Strong</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`}
+},
+park:{
+  V:{render:()=>`
+    <div class="act-content" style="background:#F0FFF4;border-color:#A8E6B0">
+      <div class="act-phase-label" style="color:#1B6B30">📊 Urban green space is public health infrastructure — read the evidence</div>
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#1B6B30;margin-bottom:12px">Urban Park Design — Public Health Evidence</h4>
+      <div class="zone-grid">
+        <div class="zone-card" style="background:#27AE60;color:#fff"><div class="zc-icon">🌳</div><span class="zc-name">Canopy Cover ≥40%</span><span class="zc-desc">WHO threshold for urban heat island mitigation. <strong>Below 40%, parks provide negligible cooling</strong> during heat events — a health risk.</span></div>
+        <div class="zone-card" style="background:#3498DB;color:#fff"><div class="zc-icon">🧘</div><span class="zc-name">Passive Restoration Zone</span><span class="zc-desc">Quiet, nature-immersive areas. <strong>12 minutes of nature exposure reduces cortisol by 21%.</strong> Not optional — these are therapeutic zones.</span></div>
+        <div class="zone-card" style="background:#E74C3C;color:#fff"><div class="zc-icon">🏃</div><span class="zc-name">Active Recreation</span><span class="zc-desc">Inclusive sports, fitness trails, play areas. <strong>Parks with mixed age programming</strong> show 40% higher daily usage across all demographics.</span></div>
+        <div class="zone-card" style="background:#9B59B6;color:#fff"><div class="zc-icon">🤝</div><span class="zc-name">Community Programme Hub</span><span class="zc-desc">Farmers markets, events, clubs. <strong>Programmed parks reduce social isolation</strong> — a key determinant of longevity in urban populations.</span></div>
+      </div>
+      <div class="vis-stat-row">
+        <div class="vis-stat"><span class="vs-num" style="color:#27AE60">300m</span><span class="vs-lbl">WHO max walk to green space</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#3498DB">21%↓</span><span class="vs-lbl">Cortisol: 12 min in nature</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#E74C3C">40%↑</span><span class="vs-lbl">Usage: mixed programming</span></div>
+      </div>
+    </div>`},
+  A:{render:()=>`
+    <div class="act-content" style="background:#1C2340;border-color:#2C3E6A;padding:0">
+      <div class="podcast-wrap">
+        <div class="pod-topbar">
+          <div class="pod-art" style="background:#27AE60">🌿</div>
+          <div class="pod-meta">
+            <div class="pod-show">Green Cities · Ep 23</div>
+            <div class="pod-ep">Parks as Public Health: The Evidence That Changes Everything</div>
+          </div>
+        </div>
+        <div class="pod-controls">
+          <button class="btn-play" id="btn-play" onclick="toggleAudio()" style="background:#27AE60;color:#fff">▶</button>
+          <div class="pod-progress-wrap">
+            <div class="pod-progress-bar"><div class="pod-progress-fill" id="pod-prog" style="background:#27AE60"></div></div>
+            <div class="pod-time"><span id="pod-time-cur">0:00</span><span id="pod-time-tot">—</span></div>
+          </div>
+          <button class="btn-stop" onclick="stopAudio()">■ Stop</button>
+        </div>
+        <div class="transcript-area" id="transcript-area"></div>
+        <div class="tts-note">🔊 Uses your browser's text-to-speech — enable audio for full experience</div>
+      </div>
+    </div>`,
+    audio:[
+      {speaker:'HOST',color:'#7BAEFF',text:'The World Health Organisation classifies urban green space as public health infrastructure. That is a significant framing. What changed?'},
+      {speaker:'DR. LIMA',color:'#6BCB77',text:'The evidence base matured. We now have robust longitudinal data showing that residents living within 300 metres of usable green space have lower rates of anxiety, depression, cardiovascular disease and all-cause mortality. These are not soft benefits. They are hard clinical outcomes.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What does the evidence say about the design of parks — not just their existence?'},
+      {speaker:'DR. LIMA',color:'#6BCB77',text:'Design matters enormously. A park with less than 40% tree canopy provides negligible cooling during heat events, which makes it a health risk rather than a health asset in a warming climate. And a park that is not programmed — no events, no community activities — is significantly underused.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'You have cited a specific cortisol study in previous work. Can you summarise it?'},
+      {speaker:'DR. LIMA',color:'#6BCB77',text:'The University of Michigan study found that just 20 to 30 minutes in a natural environment reduces cortisol levels by 21 percent. Cortisol is the primary stress hormone. That single finding has more public health implications than many pharmaceutical interventions — and it costs nothing but good park design.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What is the single decision that most differentiates a high-performing park from a low-performing one?'},
+      {speaker:'DR. LIMA',color:'#6BCB77',text:'Programming. Parks with regular, diverse community events — markets, outdoor exercise, clubs — show 40 percent higher daily usage across all age groups. An empty, beautiful park is a wasted public health intervention.'},
+    ]},
+  K:{render:()=>`
+    <div class="act-content" style="background:#F0FFF4;border-color:#A8E6B0">
+      <div class="act-phase-label" style="color:#1B6B30">🧪 Green space decisions — apply the public health evidence</div>
+      <div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,#27AE60,#2ECC71);width:0%"></div></div>
+      <div id="kine-scenarios"></div>
+    </div>`,
+    scenarios:[
+      {q:'The landscape plan shows 25% tree canopy coverage. The WHOs threshold for urban heat mitigation is 40%. Budget is tight. What do you do?',opts:['Accept 25% — it is the best available','Insist on reaching 40% canopy — it is a WHO health threshold, not a preference','Compromise at 32% with plans to reach 40% in phase 2','Plant faster-growing species even if lower quality'],correct:1,feedback:'Correct. Below 40% canopy, the park provides negligible cooling during heat events. In a warming climate this is a public health failure, not an aesthetic shortfall. The WHO threshold exists for a reason.'},
+      {q:'A councillor argues that passive restoration zones (quiet nature areas) are wasted space and wants to replace them with more sports facilities. How do you respond?',opts:['Agree — active spaces serve more users','Disagree — the cortisol evidence makes quiet nature zones a clinical asset','Suggest a compromise with a reduced quiet zone','Remove the quiet zone and add a survey to measure impact'],correct:1,feedback:'Correct. 12–20 minutes in a passive nature environment reduces cortisol by 21%. These zones are evidence-based therapeutic spaces, not wasted grass. This needs to be communicated clearly to decision-makers.'},
+      {q:'The parks team proposes a maintenance-only approach with no programming budget. Usage data already shows the park is underused. What do you recommend?',opts:['Accept — maintenance is the core function','Insist on a programming budget — events drive 40% higher usage','Suggest a volunteer-run events programme','Commission a usage study first before committing to programming'],correct:1,feedback:'Correct. The evidence shows a clear 40% usage increase in programmed parks. An unprogrammed park is an underperforming public health asset. Programming is not a luxury — it is what converts infrastructure into impact.'},
+    ]},
+  R:{render:()=>`
+    <div class="act-content" style="background:transparent;border-color:transparent;padding:0">
+      <div class="doc-wrap" style="border-color:#A8E6B0">
+        <div class="doc-header" style="background:#F0FFF4;border-color:#A8E6B0">
+          <div style="font-size:11px;font-weight:900;color:#1B6B30;text-transform:uppercase;letter-spacing:.06em">City Parks Authority · Evidence Brief</div>
+          <div style="font-size:1rem;font-weight:800;color:#2D3436;margin-top:3px">Urban Green Space: Public Health Evidence Summary</div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-section"><h4 style="color:#1B6B30">🌿 WHO & Peer-Reviewed Evidence</h4>
+            <ul class="doc-ul">
+              <li><strong>WHO Standard:</strong> Every resident should be within 300m of usable green space</li>
+              <li><strong>Cortisol Research (U. Michigan):</strong> 20–30 mins in nature reduces cortisol by 21% — equivalent stress reduction to some pharmacological interventions</li>
+              <li><strong>Canopy Threshold:</strong> ≥40% tree canopy required for meaningful urban heat island mitigation; below this, parks are heat-neutral or negative</li>
+              <li><strong>Programming Impact:</strong> Parks with active community programming show 40% higher daily usage across all age groups</li>
+            </ul>
+          </div>
+          <div class="doc-callout" style="border-color:#27AE60;color:#1B4E28;background:#F0FFF4">"Green space is not a luxury amenity. It is as much a public health infrastructure as clean water or vaccination programmes. City planners who treat it as decoration are making a category error with measurable consequences." — WHO Urban Health Technical Report, 2022</div>
+          <div class="doc-section"><h4 style="color:#1B6B30">📊 Design Standards (Evidence-Based)</h4>
+            <table class="doc-table">
+              <tr><th style="background:#D5F5E3">Standard</th><th style="background:#D5F5E3">Threshold</th><th style="background:#D5F5E3">Evidence Basis</th></tr>
+              <tr><td>Tree canopy coverage</td><td>≥40%</td><td>WHO urban heat mitigation</td></tr>
+              <tr><td>Walking distance to park</td><td>≤300m for all residents</td><td>WHO access standard</td></tr>
+              <tr><td>Passive restoration zones</td><td>≥20% of park area</td><td>Cortisol/stress reduction</td></tr>
+              <tr><td>Programmed events</td><td>≥2 per week</td><td>40% usage uplift evidence</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`}
+},
+townhall:{
+  V:{render:()=>`
+    <div class="act-content" style="background:#FFF5F5;border-color:#FFBFBF">
+      <div class="act-phase-label" style="color:#C0392B">📊 Civic architecture serves democracy — the evidence base matters</div>
+      <h4 style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:#C0392B;margin-bottom:12px">Civic Architecture — Principles & Evidence</h4>
+      <div class="zone-grid">
+        <div class="zone-card" style="background:#C0392B;color:#fff"><div class="zc-icon">⚖️</div><span class="zc-name">Democratic Layout</span><span class="zc-desc">Horseshoe or circular chamber design increases perceived fairness by <strong>34%</strong> vs. adversarial row formats. Layout shapes civic culture.</span></div>
+        <div class="zone-card" style="background:#2980B9;color:#fff"><div class="zc-icon">🚪</div><span class="zc-name">Radical Accessibility</span><span class="zc-desc"><strong>Step-free access, visible public gallery, open lobby</strong> — evidence shows physical barriers correlate directly with reduced civic participation.</span></div>
+        <div class="zone-card" style="background:#8E44AD;color:#fff"><div class="zc-icon">🏛️</div><span class="zc-name">Civic Legibility</span><span class="zc-desc">Citizens must be able to read the building as public space. <strong>Architectural ambiguity reduces trust</strong> in the institution it houses.</span></div>
+        <div class="zone-card" style="background:#27AE60;color:#fff"><div class="zc-icon">📡</div><span class="zc-name">Digital-Physical Hybrid</span><span class="zc-desc">Services available both in-person and online. <strong>Hybrid delivery increases access</strong> without reducing the civic power of the physical space.</span></div>
+      </div>
+      <div class="vis-stat-row">
+        <div class="vis-stat"><span class="vs-num" style="color:#C0392B">34%</span><span class="vs-lbl">Fairness perception: circular</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#2980B9">3×</span><span class="vs-lbl">Participation: accessible design</span></div>
+        <div class="vis-stat"><span class="vs-num" style="color:#8E44AD">41%↑</span><span class="vs-lbl">Trust: legible civic design</span></div>
+      </div>
+    </div>`},
+  A:{render:()=>`
+    <div class="act-content" style="background:#1C2340;border-color:#2C3E6A;padding:0">
+      <div class="podcast-wrap">
+        <div class="pod-topbar">
+          <div class="pod-art" style="background:#E74C3C">🏛️</div>
+          <div class="pod-meta">
+            <div class="pod-show">Civics & Space · Ep 31</div>
+            <div class="pod-ep">Does Architecture Shape Democracy?</div>
+          </div>
+        </div>
+        <div class="pod-controls">
+          <button class="btn-play" id="btn-play" onclick="toggleAudio()" style="background:#E74C3C;color:#fff">▶</button>
+          <div class="pod-progress-wrap">
+            <div class="pod-progress-bar"><div class="pod-progress-fill" id="pod-prog" style="background:#E74C3C"></div></div>
+            <div class="pod-time"><span id="pod-time-cur">0:00</span><span id="pod-time-tot">—</span></div>
+          </div>
+          <button class="btn-stop" onclick="stopAudio()">■ Stop</button>
+        </div>
+        <div class="transcript-area" id="transcript-area"></div>
+        <div class="tts-note">🔊 Uses your browser's text-to-speech — enable audio for full experience</div>
+      </div>
+    </div>`,
+    audio:[
+      {speaker:'HOST',color:'#7BAEFF',text:'Can the layout of a council chamber actually affect how democratically decisions are made? That seems like a strong claim.'},
+      {speaker:'PROF. ROSS',color:'#FF8A80',text:'The evidence is compelling. Research comparing horseshoe and circular chamber layouts with adversarial row formats consistently finds higher perceived fairness scores and more collaborative deliberation outcomes in the non-adversarial configurations. The layout physically encodes the culture of the institution.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'What about accessibility — is there evidence that physical design affects civic participation?'},
+      {speaker:'PROF. ROSS',color:'#FF8A80',text:'Absolutely. Buildings with prominent steps, narrow entrances, unclear navigation and no visible public gallery correlate with lower participation rates — particularly among older residents, people with disabilities and those from lower socioeconomic backgrounds. Physical barriers become democratic barriers.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'You use the phrase civic legibility. What does that mean?'},
+      {speaker:'PROF. ROSS',color:'#FF8A80',text:'A citizen should be able to look at a Town Hall and immediately understand it as a public building that belongs to them. Research shows that ambiguous civic buildings — those that look like commercial offices, for instance — generate measurably lower institutional trust scores among residents.'},
+      {speaker:'HOST',color:'#7BAEFF',text:'How do you balance the need for authority and grandeur with genuine accessibility?'},
+      {speaker:'PROF. ROSS',color:'#FF8A80',text:'The best civic buildings manage this through invitation rather than imposition. Wide steps that bring you in rather than keeping you out. A lobby that feels like a public square. Visible signage that treats visitors as citizens, not petitioners. Grandeur and accessibility are not in tension — they are both expressions of respect.'},
+    ]},
+  K:{render:()=>`
+    <div class="act-content" style="background:#FFF5F5;border-color:#FFBFBF">
+      <div class="act-phase-label" style="color:#C0392B">🧪 Civic design decisions — democracy is in the details</div>
+      <div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,#E74C3C,#C0392B);width:0%"></div></div>
+      <div id="kine-scenarios"></div>
+    </div>`,
+    scenarios:[
+      {q:'The chamber design shows traditional adversarial rows (government facing opposition). Research suggests circular or horseshoe formats produce better deliberative outcomes. What do you recommend?',opts:['Keep adversarial rows — it is democratic tradition','Recommend a horseshoe or circular format based on the evidence','Suggest a hybrid with adjustable seating','Leave the decision to elected members without input'],correct:1,feedback:'Correct. Evidence shows 34% higher perceived fairness in non-adversarial layouts. An evidence-based adviser must present this clearly — tradition is not a sufficient justification when measurable outcomes point elsewhere.'},
+      {q:'The main entrance requires six steps up from street level with no ground-level alternative visible. An accessibility consultant flags this. The architect says it creates an impressive civic presence. Who do you support?',opts:['The architect — civic grandeur matters','The accessibility consultant — physical barriers are democratic barriers','Compromise with a side ramp','Commission a public consultation first'],correct:1,feedback:'Correct. Research shows physical accessibility barriers directly reduce civic participation rates, disproportionately affecting older residents and people with disabilities. Democratic participation is the primary function — it cannot be compromised for aesthetics.'},
+      {q:'The building design is clean and modern but looks indistinguishable from a corporate office. Residents in focus groups describe it as "not feeling public." What do you do?',opts:['Proceed — functionality matters more than symbolism','Require a redesign to address civic legibility — buildings that look corporate generate lower trust','Add a large sign to clarify it is public','Dismiss the focus group as unrepresentative'],correct:1,feedback:'Correct. Civic legibility is not superficial. Research shows buildings that citizens cannot immediately read as public space generate measurably lower institutional trust. The design must communicate its democratic purpose.'},
+    ]},
+  R:{render:()=>`
+    <div class="act-content" style="background:transparent;border-color:transparent;padding:0">
+      <div class="doc-wrap" style="border-color:#FFBFBF">
+        <div class="doc-header" style="background:#FFF5F5;border-color:#FFBFBF">
+          <div style="font-size:11px;font-weight:900;color:#C0392B;text-transform:uppercase;letter-spacing:.06em">RIBA Civic Design Centre · Evidence Brief</div>
+          <div style="font-size:1rem;font-weight:800;color:#2D3436;margin-top:3px">Town Halls & Democratic Architecture: What the Research Shows</div>
+        </div>
+        <div class="doc-body">
+          <div class="doc-section"><h4 style="color:#C0392B">🏛️ Key Research Findings</h4>
+            <ul class="doc-ul">
+              <li><strong>Chamber Layout:</strong> Circular/horseshoe formats show 34% higher perceived fairness vs. adversarial rows (Oxford Political Space Study, 2021)</li>
+              <li><strong>Physical Accessibility:</strong> Accessible civic buildings generate up to 3× higher participation rates among underrepresented groups</li>
+              <li><strong>Civic Legibility:</strong> Buildings readable as public space score 41% higher on institutional trust measures vs. ambiguous-design equivalents</li>
+              <li><strong>Digital Integration:</strong> Hybrid physical-digital service delivery increases total access without reducing the democratic value of the physical space</li>
+            </ul>
+          </div>
+          <div class="doc-callout" style="border-color:#E74C3C;color:#7B241C;background:#FDEDEC">"A Town Hall is not merely a building — it is a democratic instrument. Every spatial decision — the height of the steps, the layout of the chamber, the visibility of the public gallery — encodes a message about who this space belongs to." — RIBA Civic Architecture Report, 2023</div>
+          <div class="doc-section"><h4 style="color:#C0392B">📊 Evidence-Based Design Criteria</h4>
+            <table class="doc-table">
+              <tr><th style="background:#FDEDEC">Design Element</th><th style="background:#FDEDEC">Evidence-Based Standard</th></tr>
+              <tr><td>Council chamber layout</td><td>Horseshoe or circular preferred over adversarial rows</td></tr>
+              <tr><td>Physical accessibility</td><td>Step-free ground-level access — visible, not hidden</td></tr>
+              <tr><td>Public gallery</td><td>Prominent, easy-to-find, minimum 200 seats</td></tr>
+              <tr><td>Civic legibility</td><td>Building must be architecturally readable as public space</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`}
+}
+};
+
+// ═══════════════════════════════════════════════════════
+// QUIZZES (3 per mission, all paths share same quiz)
+// ═══════════════════════════════════════════════════════
+const QUIZZES={
+library:[
+  {q:'According to the evidence, what is the primary driver of modern library visit numbers?',opts:['Size of the book collection','Digital resource hub access','Opening hours','Number of staff'],ans:1},
+  {q:'What does research show happens to repeat visit rates when libraries add social and collaborative spaces?',opts:['They stay the same','They decrease slightly','They roughly double','They increase by 10%'],ans:2},
+  {q:'Which statement best reflects the IFLA evidence on library value?',opts:['A library\'s value is measured by its collection size','Community interaction and programming are inseparable from learning function','Quiet study is the only function that matters','Digital access is replacing the need for physical libraries'],ans:1},
+],
+hospital:[
+  {q:'What is the approximate reduction in healthcare-acquired infections achieved through single-occupancy rooms?',opts:['Up to 10%','Up to 20%','Up to 40%','Up to 60%'],ans:2},
+  {q:'Why must diagnostics (labs/imaging) be located adjacent to A&E — not on a different floor?',opts:['Aesthetics and visual flow','Reduced result turnaround time by ~40%','Lower construction cost','Easier for visiting relatives'],ans:1},
+  {q:'Natural light on hospital wards has been linked to which outcome?',opts:['Higher staff satisfaction only','Faster patient recovery (6–8%) and lower staff burnout','Lower utility costs','Reduced medication errors'],ans:1},
+],
+school:[
+  {q:'The University of Salford research found that the physical school environment accounts for what proportion of Year-1 student progress?',opts:['Up to 5%','Up to 10%','Up to 25%','Up to 50%'],ans:2},
+  {q:'Why do fixed-row seating arrangements limit educational outcomes?',opts:['They are less comfortable','They restrict teaching to one mode, preventing collaborative and active learning','They are more expensive to maintain','Students prefer flexible layouts aesthetically'],ans:1},
+  {q:'What physiological mechanism explains the benefit of biophilic design in schools?',opts:['Increased serotonin from colour exposure','Reduced cortisol (stress hormone) leading to better cognitive function','Improved posture from natural seating','Enhanced visual acuity from natural light'],ans:1},
+],
+park:[
+  {q:'What tree canopy coverage does the WHO recommend to achieve meaningful urban heat island mitigation?',opts:['At least 20%','At least 30%','At least 40%','At least 60%'],ans:2},
+  {q:'University of Michigan research found that how many minutes in a natural environment reduces cortisol by 21%?',opts:['5 minutes','20–30 minutes','60 minutes','Only with daily repeated exposure'],ans:1},
+  {q:'What impact does active community programming have on park usage, according to the evidence?',opts:['Negligible effect on overall usage','Approximately 40% higher daily usage across all age groups','Usage only increases among younger residents','It depends entirely on the quality of individual events'],ans:1},
+],
+townhall:[
+  {q:'Research comparing chamber layouts found that circular or horseshoe formats produce what effect vs. adversarial rows?',opts:['Higher perceived efficiency','34% higher perceived fairness in deliberation','Lower construction costs','No measurable difference'],ans:1},
+  {q:'Physical accessibility barriers in civic buildings are linked to which outcome?',opts:['No measurable effect on participation','Lower participation rates, especially among underrepresented groups','Increased security and institutional trust','Higher footfall from formal visitors'],ans:1},
+  {q:'What does "civic legibility" mean in the context of Town Hall architecture?',opts:['Signage must be legible from the street','The building must be architecturally readable as a public space, not a corporate office','The planning documents must be publicly available','Meeting minutes must be published promptly'],ans:1},
+],
+};
+
+// ═══════════════════════════════════════════════════════
+// BUILDING SVGs
+// ═══════════════════════════════════════════════════════
+const BSVG={
+  library:(x,y)=>`<g transform="translate(${x},${y})"><rect x="0" y="-8" width="110" height="8" rx="2" fill="#2952C8"/><rect x="5" y="-16" width="100" height="8" rx="2" fill="#4060D8"/><rect x="10" y="-100" width="90" height="84" fill="#5B8FF9"/><polygon points="5,-100 55,-130 105,-100" fill="#3D6FDE"/><rect x="15" y="-100" width="12" height="84" rx="4" fill="#7FACFF"/><rect x="38" y="-100" width="12" height="84" rx="4" fill="#7FACFF"/><rect x="61" y="-100" width="12" height="84" rx="4" fill="#7FACFF"/><rect x="84" y="-100" width="12" height="84" rx="4" fill="#7FACFF"/><rect x="43" y="-50" width="24" height="34" rx="3" fill="#2952C8"/><rect x="17" y="-90" width="12" height="18" rx="2" fill="#B8D4FF"/><rect x="81" y="-90" width="12" height="18" rx="2" fill="#B8D4FF"/><rect x="44" y="-124" width="22" height="14" rx="2" fill="#FFD93D"/><line x1="55" y1="-124" x2="55" y2="-110" stroke="#2952C8" stroke-width="2"/></g>`,
+  hospital:(x,y)=>`<g transform="translate(${x},${y})"><rect x="0" y="-8" width="105" height="8" rx="2" fill="#2A9D8F"/><rect x="5" y="-115" width="95" height="107" rx="3" fill="#F0FFFD"/><rect x="5" y="-115" width="95" height="107" rx="3" fill="none" stroke="#2A9D8F" stroke-width="2"/><rect x="0" y="-122" width="105" height="12" rx="3" fill="#4ECDC4"/><rect x="38" y="-104" width="29" height="10" rx="2" fill="#FF6B6B"/><rect x="47" y="-113" width="11" height="28" rx="2" fill="#FF6B6B"/><rect x="12" y="-88" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="43" y="-88" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="73" y="-88" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="12" y="-64" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="43" y="-64" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="73" y="-64" width="20" height="16" rx="2" fill="#BDEEF5"/><rect x="38" y="-38" width="29" height="30" rx="4" fill="#1ABC9C"/></g>`,
+  school:(x,y)=>`<g transform="translate(${x},${y})"><rect x="0" y="-105" width="80" height="105" rx="3" fill="#FFD93D"/><rect x="82" y="-125" width="26" height="125" rx="3" fill="#F9A825"/><polygon points="82,-125 95,-148 108,-125" fill="#F57F17"/><circle cx="95" cy="-136" r="7" fill="#FF8C00"/><rect x="8" y="-90" width="20" height="18" rx="2" fill="#FFF9C4"/><rect x="36" y="-90" width="20" height="18" rx="2" fill="#FFF9C4"/><rect x="8" y="-64" width="20" height="18" rx="2" fill="#FFF9C4"/><rect x="36" y="-64" width="20" height="18" rx="2" fill="#FFF9C4"/><rect x="87" y="-110" width="14" height="18" rx="2" fill="#FFF9C4"/><rect x="26" y="-38" width="28" height="38" rx="4" fill="#E65100"/><line x1="95" y1="-148" x2="95" y2="-162" stroke="#795548" stroke-width="2.5"/><polygon points="95,-162 113,-156 95,-150" fill="#FF6B6B"/></g>`,
+  park:(x,y)=>`<g transform="translate(${x},${y})"><ellipse cx="47" cy="-5" rx="46" ry="7" fill="#4CAF50" opacity="0.4"/><rect x="12" y="-60" width="7" height="55" rx="3" fill="#795548"/><circle cx="15" cy="-70" r="26" fill="#6BCB77"/><circle cx="8" cy="-58" r="18" fill="#4CAF50"/><circle cx="24" cy="-62" r="16" fill="#55A645"/><rect x="76" y="-60" width="7" height="55" rx="3" fill="#795548"/><circle cx="79" cy="-70" r="24" fill="#6BCB77"/><circle cx="72" cy="-58" r="16" fill="#4CAF50"/><circle cx="88" cy="-62" r="18" fill="#55A645"/><ellipse cx="47" cy="-28" rx="20" ry="9" fill="#64B5F6"/><ellipse cx="47" cy="-32" rx="12" ry="5" fill="#90CAF9"/><ellipse cx="47" cy="-35" rx="5" ry="3" fill="#BBDEFB"/><rect x="32" y="-18" width="30" height="5" rx="3" fill="#A1887F"/><rect x="34" y="-24" width="5" height="9" rx="2" fill="#795548"/><rect x="55" y="-24" width="5" height="9" rx="2" fill="#795548"/></g>`,
+  townhall:(x,y)=>`<g transform="translate(${x},${y})"><rect x="0" y="-8" width="115" height="8" rx="2" fill="#C0392B"/><rect x="6" y="-18" width="103" height="10" rx="2" fill="#D32F2F"/><rect x="12" y="-108" width="91" height="90" fill="#FF8A80"/><rect x="30" y="-125" width="55" height="20" rx="3" fill="#FF7043"/><ellipse cx="57" cy="-125" rx="30" ry="20" fill="#FF5722"/><line x1="57" y1="-145" x2="57" y2="-162" stroke="#795548" stroke-width="2.5"/><polygon points="57,-162 80,-156 57,-150" fill="#FFD93D"/><rect x="14" y="-108" width="10" height="90" rx="3" fill="#FFAB91"/><rect x="34" y="-108" width="10" height="90" rx="3" fill="#FFAB91"/><rect x="71" y="-108" width="10" height="90" rx="3" fill="#FFAB91"/><rect x="91" y="-108" width="10" height="90" rx="3" fill="#FFAB91"/><rect x="16" y="-96" width="14" height="16" rx="2" fill="#FFCCBC"/><rect x="85" y="-96" width="14" height="16" rx="2" fill="#FFCCBC"/><rect x="44" y="-62" width="27" height="44" rx="13" fill="#B71C1C"/><rect x="44" y="-42" width="27" height="24" fill="#B71C1C"/></g>`,
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let S={
+  screen:'welcome',
+  completed:[],
+  styleScore:{V:0,A:0,R:0,K:0},
+  totalScore:0,
+  correctAnswers:0,
+  totalAnswers:0,
+  currentMission:null,
+  currentPath:null,
+  modalOpen:false,
+  // activity sub-state
+  kineScenario:0,
+  kineAnswers:[],  // true/false per scenario
+  // quiz
+  quizAnswers:[null,null,null],
+  quizSubmitted:false,
+  quizPassed:false,
+  quizRetryUsed:false,
+  // audio
+  audioLines:[],
+  audioIndex:-1,
+  audioPlaying:false,
+};
+
+// ═══════════════════════════════════════════════════════
+// AUDIO ENGINE — StreamElements TTS (free, no key, unlimited)
+// ═══════════════════════════════════════════════════════
+// Two distinct voices: Brian (British male) for HOST, Amy (British female) for GUEST
+// API: https://api.streamelements.com/kappa/v2/speech?voice=X&text=Y
+// Completely free, no account, no rate limit for normal usage.
+
+const SE_VOICES = { HOST:'Brian', GUEST:'Amy' };
+let audioCache  = {};     // "SPEAKER|||text" → blob URL (session cache)
+let currentAudio = null;  // active HTMLAudioElement
+let ttsQueue=[], ttsTimer=null, ttsLineIndex=-1, ttsTotalLines=0, ttsStartTime=0;
+
+// ── Core helpers ──
+function initAudio(lines){
+  stopAudio();
+  ttsQueue=lines; ttsTotalLines=lines.length; ttsLineIndex=-1;
+  renderTranscript(lines);
+}
+
+function renderTranscript(lines){
+  const el=document.getElementById('transcript-area');
+  if(!el)return;
+  el.innerHTML=lines.map((l,i)=>`<div class="transcript-line" id="tl-${i}">
+    <span class="tl-speaker" style="color:${l.color}">${l.speaker}</span>
+    <span class="tl-text">${l.text}</span>
+  </div>`).join('');
+}
+
+function highlightLine(i){
+  document.querySelectorAll('.transcript-line').forEach(e=>e.classList.remove('active'));
+  const el=document.getElementById('tl-'+i);
+  if(el){el.classList.add('active');el.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  ttsLineIndex=i; updatePodProgress();
+}
+
+function updatePodProgress(){
+  const pct=ttsTotalLines>0?(ttsLineIndex+1)/ttsTotalLines*100:0;
+  const prog=document.getElementById('pod-prog'); if(prog)prog.style.width=pct+'%';
+  const cur=document.getElementById('pod-time-cur');
+  if(cur){const s=Math.round((Date.now()-ttsStartTime)/1000);cur.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
+}
+
+function setBtnState(state){
+  const btn=document.getElementById('btn-play'); if(!btn)return;
+  if(state==='loading'){btn.textContent='⟳';btn.style.opacity='.6';}
+  else if(state==='pause'){btn.textContent='⏸';btn.style.opacity='1';}
+  else{btn.textContent='▶';btn.style.opacity='1';}
+}
+
+// ── StreamElements fetch with session cache ──
+async function fetchSE(text, speaker){
+  const cacheKey=speaker+'|||'+text;
+  if(audioCache[cacheKey])return audioCache[cacheKey];
+  const voice=SE_VOICES[speaker]||'Brian';
+  const url=`https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(text)}`;
+  try{
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('SE TTS HTTP '+res.status);
+    const blob=await res.blob();
+    const blobUrl=URL.createObjectURL(blob);
+    audioCache[cacheKey]=blobUrl;
+    return blobUrl;
+  }catch(e){
+    console.warn('StreamElements TTS failed:',e.message);
+    return null;
+  }
+}
+
+// ── Playback chain ──
+async function speakLine(i){
+  if(!S.audioPlaying||i>=ttsQueue.length){
+    if(i>=ttsQueue.length){setBtnState('play');S.audioPlaying=false;}
+    return;
+  }
+  highlightLine(i); setBtnState('loading');
+  // Prefetch next line in background while this one loads
+  if(i+1<ttsQueue.length) fetchSE(ttsQueue[i+1].text, ttsQueue[i+1].speaker);
+
+  const url=await fetchSE(ttsQueue[i].text, ttsQueue[i].speaker);
+  if(!S.audioPlaying)return;
+
+  if(!url){
+    // StreamElements failed — fall back to browser speech for this line
+    setBtnState('pause');
+    if(window.speechSynthesis){
+      const u=new SpeechSynthesisUtterance(ttsQueue[i].text);
+      u.rate=0.88; u.pitch=ttsQueue[i].speaker==='HOST'?0.95:1.1;
+      u.onend=()=>{if(S.audioPlaying)speakLine(i+1);};
+      speechSynthesis.speak(u);
+    } else { speakLine(i+1); }
+    return;
+  }
+
+  setBtnState('pause');
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
+  const audio=new Audio(url); currentAudio=audio;
+  audio.playbackRate=0.96; // slightly slower = more natural podcast feel
+  audio.play().catch(()=>{});
+  audio.onended=()=>{
+    clearInterval(ttsTimer);
+    if(S.audioPlaying) speakLine(i+1);
+  };
+  ttsTimer=setInterval(updatePodProgress, 800);
+}
+
+// ── Public controls ──
+function toggleAudio(){
+  if(!S.audioPlaying){
+    S.audioPlaying=true;
+    if(ttsStartTime===0) ttsStartTime=Date.now();
+    const from=ttsLineIndex<0?0:ttsLineIndex;
+    speakLine(from);
+    const tot=document.getElementById('pod-time-tot');
+    if(tot)tot.textContent='~'+Math.round(ttsQueue.length*5)+'s';
+  } else {
+    S.audioPlaying=false;
+    if(currentAudio) currentAudio.pause();
+    if(window.speechSynthesis) speechSynthesis.cancel();
+    clearInterval(ttsTimer);
+    setBtnState('play');
+  }
+}
+
+function stopAudio(){
+  S.audioPlaying=false;
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  clearInterval(ttsTimer); ttsLineIndex=-1; ttsStartTime=0;
+  setBtnState('play');
+  const prog=document.getElementById('pod-prog'); if(prog)prog.style.width='0%';
+  document.querySelectorAll('.transcript-line').forEach(e=>e.classList.remove('active'));
+}
+
+// ── Key panel stubs (no longer needed — kept so render code doesn't break) ──
+function elKeyPanelHtml(){ return `<div class="tts-badge"><span class="tts-badge-dot"></span>StreamElements AI Voice<span class="tts-badge-info">Free · Unlimited · 2 distinct voices · No setup</span></div>`; }
+function saveElKey(){} function clearElKey(){}
+
+// ═══════════════════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════════════════
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=['#FFD93D','#FF6B6B','#4ECDC4','#A29BFE','#6BCB77','#FF8A80','#5B8FF9','#FDCB6E'];
+  const p=Array.from({length:100},()=>({x:Math.random()*canvas.width,y:-10,vx:(Math.random()-.5)*4,vy:Math.random()*4+2,r:Math.random()*7+3,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*360,rs:(Math.random()-.5)*10,shape:Math.random()>.5?'rect':'circle'}));
+  let f=0;
+  (function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);p.forEach(q=>{ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.rot*Math.PI/180);ctx.fillStyle=q.color;ctx.globalAlpha=Math.max(0,1-f/130);if(q.shape==='rect')ctx.fillRect(-q.r,-q.r/2,q.r*2,q.r);else{ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();}ctx.restore();q.x+=q.vx;q.y+=q.vy;q.rot+=q.rs;q.vy+=.06;});f++;if(f<150)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);})();
+}
+
+// ═══════════════════════════════════════════════════════
+// CITY SVG
+// ═══════════════════════════════════════════════════════
+function citySvg(){
+  const lots=MISSIONS.map(m=>{
+    if(S.completed.includes(m.id)){
+      return `<g class="building-slot" id="built-${m.id}">${BSVG[m.id](m.cityX,m.cityY)}</g>`;
+    }
+    const cx=m.cityX+m.cityW/2,topY=m.cityY-90;
+    return `<g id="lot-${m.id}" onclick="openMission('${m.id}')" style="cursor:pointer">
+      <rect x="${m.cityX}" y="${topY}" width="${m.cityW}" height="90" rx="8" fill="none" stroke="${m.color}" stroke-width="2" stroke-dasharray="8 5" opacity=".8"/>
+      <text x="${cx}" y="${topY+28}" text-anchor="middle" font-size="22" dominant-baseline="middle">${m.icon}</text>
+      <text x="${cx}" y="${topY+52}" text-anchor="middle" font-size="10" font-family="Fredoka One,cursive" fill="${m.color}">${m.name}</text>
+      <rect x="${cx-22}" y="${topY+62}" width="44" height="17" rx="8" fill="${m.color}" opacity=".9"/>
+      <text x="${cx}" y="${topY+72}" text-anchor="middle" font-size="9" font-family="Nunito,sans-serif" font-weight="800" fill="#fff" dominant-baseline="middle">+ BUILD</text>
+    </g>`;
+  }).join('');
+  return `<svg width="100%" viewBox="0 0 660 215" xmlns="http://www.w3.org/2000/svg" style="display:block">
+    <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5DADE2"/><stop offset="60%" stop-color="#85C1E9"/><stop offset="100%" stop-color="#D6EAF8"/></linearGradient></defs>
+    <rect width="660" height="185" fill="url(#sg)"/>
+    <rect y="185" width="660" height="30" fill="#7EC850"/>
+    <rect y="190" width="660" height="10" fill="#5AAA30"/>
+    <rect y="198" width="660" height="12" fill="#C8B88A" rx="2"/>
+    <line x1="0" y1="204" x2="660" y2="204" stroke="#fff" stroke-width="1.5" stroke-dasharray="20 14" opacity=".5"/>
+    <circle cx="622" cy="30" r="26" fill="#FFD93D" opacity=".95"/><circle cx="622" cy="30" r="22" fill="#FFE566"/>
+    <ellipse cx="60" cy="28" rx="36" ry="13" fill="#fff" opacity=".85"/><circle cx="44" cy="21" r="15" fill="#fff" opacity=".85"/><circle cx="68" cy="19" r="19" fill="#fff" opacity=".85"/>
+    <ellipse cx="240" cy="44" rx="29" ry="10" fill="#fff" opacity=".8"/><circle cx="226" cy="37" r="13" fill="#fff" opacity=".8"/><circle cx="254" cy="35" r="15" fill="#fff" opacity=".8"/>
+    <ellipse cx="455" cy="26" rx="33" ry="11" fill="#fff" opacity=".82"/><circle cx="440" cy="19" r="14" fill="#fff" opacity=".82"/><circle cx="468" cy="17" r="17" fill="#fff" opacity=".82"/>
+    ${lots}
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════
+function styleTrackerHtml(){
+  const total=Math.max(1,S.completed.length);
+  return `<div class="style-tracker">
+    <h4>🎯 Your Learning Style Profile</h4>
+    ${PATHS.map(p=>{const c=S.styleScore[p.id];const pct=Math.round(c/total*100);return`<div class="sbar-row"><div class="sbar-lbl" style="color:${p.text||p.color}">${p.icon} ${p.short}</div><div class="sbar-track"><div class="sbar-fill" style="width:${pct}%;background:${p.color}"></div></div><div class="sbar-n" style="color:${p.color}">${c}</div></div>`}).join('')}
+    <div style="font-size:11px;color:var(--muted);margin-top:5px">${S.completed.length}/5 complete · Overall accuracy: ${S.totalAnswers>0?Math.round(S.correctAnswers/S.totalAnswers*100):0}%</div>
+  </div>`;
+}
+
+function quizHtml(){
+  const qs=QUIZZES[S.currentMission.id];
+  return `<div class="quiz-section">
+    <div class="quiz-header">
+      <div class="quiz-badge">🧠 Knowledge Check</div>
+      <div class="quiz-instruction">Answer all 3 questions. You need 2/3 correct to unlock the build button.</div>
+    </div>
+    ${qs.map((q,qi)=>`<div class="q-item">
+      <div class="q-text"><span class="q-num">Q${qi+1}.</span>${q.q}</div>
+      <div class="q-opts">${q.opts.map((opt,oi)=>{
+        let cls='q-opt';
+        if(S.quizSubmitted){
+          if(oi===q.ans)cls+=' ans-correct';
+          else if(S.quizAnswers[qi]===oi&&oi!==q.ans)cls+=' ans-wrong';
+          else cls+='';
+        } else {
+          if(S.quizAnswers[qi]===oi)cls+=' selected';
+        }
+        return`<button class="${cls}" onclick="selectQ(${qi},${oi})" ${S.quizSubmitted?'disabled':''}>${opt}</button>`;
+      }).join('')}</div>
+    </div>`).join('')}
+    <div class="quiz-submit-row">
+      ${S.quizSubmitted
+        ? (() => {
+            const score=qs.filter((q,i)=>S.quizAnswers[i]===q.ans).length;
+            return score>=2
+              ? `<div class="quiz-result-msg qr-pass">✅ ${score}/3 correct — excellent! You can now build this structure.</div>`
+              : `<div class="quiz-result-msg qr-fail">❌ ${score}/3 correct — review the material above, then try again.</div>
+                 ${!S.quizRetryUsed?`<button class="btn-retry-quiz" onclick="retryQuiz()">↩ Retry Quiz</button>`:''}`
+          })()
+        : `<button class="btn-submit-quiz" ${S.quizAnswers.includes(null)?'disabled':''} onclick="submitQuiz()">Submit Answers →</button>`
+      }
+    </div>
+  </div>`;
+}
+
+function kineScenariosHtml(){
+  const m=S.currentMission, c=CONTENT[m.id].K;
+  const scens=c.scenarios;
+  const cur=S.kineScenario;
+  const doneCount=S.kineAnswers.length;
+  const pct=doneCount/scens.length*100;
+
+  let html=`<div class="kine-progress"><div class="kine-prog-fill" id="kprog" style="background:linear-gradient(90deg,${m.color},${m.dark});width:${pct}%"></div></div>`;
+
+  scens.forEach((sc,i)=>{
+    const answered=i<doneCount;
+    const isCurrent=i===doneCount;
+    const wasCorrect=answered?S.kineAnswers[i]:null;
+
+    html+=`<div class="kine-scenario" style="border-color:${answered?(wasCorrect?'#27AE60':'#E74C3C'):m.color};background:${answered?(wasCorrect?'#F0FFF4':'#FDEDEC'):'#fff'};${!isCurrent&&!answered?'opacity:.45;pointer-events:none':''}">
+      <h4>📋 Scenario ${i+1} of ${scens.length}</h4>
+      <p style="font-size:13px;line-height:1.6;margin-bottom:10px;color:#2D3436">${sc.q}</p>
+      <div class="kine-choices">
+        ${sc.opts.map((opt,oi)=>`<button class="kc-btn ${answered&&oi===sc.correct?'picked-correct':''} ${answered&&oi!==sc.correct&&S.kineChoices&&S.kineChoices[i]===oi?'picked-wrong':''}" style="border-color:${m.color};color:${m.text||m.dark}" onclick="kineChoose(${i},${oi})" ${answered?'disabled':''}>${opt}</button>`).join('')}
+      </div>
+      ${answered?`<div class="kine-feedback show" style="background:${wasCorrect?'#D5F5E3':'#FDEDEC'};color:${wasCorrect?'#1B5E20':'#7B241C'};border:1.5px solid ${wasCorrect?'#A9DFBF':'#F5B7B1'}">${wasCorrect?'✅':'❌'} ${sc.feedback}</div>`:''}
+    </div>`;
+  });
+
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════════
+function renderWelcome(){
+  return `<div id="screen-welcome">
+    <div class="welcome-sun"></div>
+    <div class="wcloud wc1"></div><div class="wcloud wc2"></div>
+    <svg width="100%" viewBox="0 0 700 110" xmlns="http://www.w3.org/2000/svg" style="display:block">
+      <rect x="30" y="55" width="68" height="55" fill="#5B8FF9" opacity=".45" rx="4"/><polygon points="25,55 63,28 101,55" fill="#3D6FDE" opacity=".45"/>
+      <rect x="118" y="38" width="55" height="72" fill="#4ECDC4" opacity=".4" rx="3"/><rect x="114" y="30" width="63" height="13" rx="3" fill="#2A9D8F" opacity=".4"/>
+      <rect x="190" y="48" width="75" height="62" fill="#FFD93D" opacity=".38" rx="3"/>
+      <rect x="280" y="68" width="65" height="42" fill="#6BCB77" opacity=".38" rx="3"/>
+      <rect x="360" y="32" width="80" height="78" fill="#FF8A80" opacity=".42" rx="3"/><ellipse cx="400" cy="32" rx="25" ry="17" fill="#FF5722" opacity=".38"/>
+      <rect x="460" y="52" width="60" height="58" fill="#A29BFE" opacity=".38" rx="3"/>
+      <rect y="105" width="700" height="8" fill="#7EC850" opacity=".55" rx="2"/>
+    </svg>
+    <div class="welcome-inner">
+      <div class="game-badge">🏆 Adult Learning Styles Discovery</div>
+      <h1 class="welcome-title">Build-a-City!</h1>
+      <p class="welcome-sub">Complete 5 professional missions, engage with real evidence, and prove your understanding — then discover exactly how you learn.</p>
+      <div class="feature-pills">
+        <div class="feat">🏙️ 5 Expert Missions</div>
+        <div class="feat">🧠 Knowledge Checks Required</div>
+        <div class="feat">🔊 Real Audio Playback</div>
+        <div class="feat">📊 VARK Profile + Accuracy Score</div>
+      </div>
+      <button class="btn-start" onclick="startGame()">🚀 Start Building!</button>
+    </div>
+  </div>`;
+}
+
+function renderCity(){
+  const cards=MISSIONS.map(m=>{
+    const done=S.completed.includes(m.id);
+    return `<div class="m-card ${done?'done':'avail'}" onclick="${done?'':` openMission('${m.id}')`}">
+      ${done?'<div class="m-check">✓</div>':''}
+      <div class="m-icon">${m.icon}</div>
+      <div class="m-name">${m.name}</div>
+      <div class="m-status">${done?'✅ Built':'Tap to build'}</div>
+    </div>`;
+  }).join('');
+  return `<div id="screen-city">
+    <div class="city-header">
+      <div>
+        <div class="fredoka" style="font-size:1.25rem;color:#fff">🏙️ Learnville</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">${S.completed.length}/5 built · ${S.totalAnswers>0?Math.round(S.correctAnswers/S.totalAnswers*100):0}% overall accuracy</div>
+      </div>
+      <div class="score-chips">
+        ${PATHS.map(p=>`<div class="schip">${p.icon}${S.styleScore[p.id]}</div>`).join('')}
+      </div>
+    </div>
+    <div class="city-canvas-wrap">${citySvg()}</div>
+    <div class="city-bottom">
+      <h3 class="fredoka" style="margin-bottom:10px">🏗️ Choose your next mission</h3>
+      <div class="mission-grid">${cards}</div>
+      ${styleTrackerHtml()}
+    </div>
+  </div>`;
+}
+
+function renderModal(){
+  if(!S.modalOpen||!S.currentMission)return'';
+  const m=S.currentMission;
+  return `<div class="overlay" id="mission-overlay" onclick="closeMissionBg(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-hdr">
+        <div class="modal-big-icon" style="background:${m.color}22;border:2px solid ${m.color}44">${m.icon}</div>
+        <div><div class="modal-mission-title fredoka">${m.name}</div><div style="font-size:12px;color:${m.color};font-weight:800">${m.tag}</div></div>
+      </div>
+      <p class="modal-desc">${m.desc}</p>
+      <div class="paths-label">⚡ Choose your learning approach</div>
+      <div class="path-grid">
+        ${PATHS.map(p=>`<button class="path-btn pb-${p.id}" onclick="choosePath('${m.id}','${p.id}')">
+          <span class="pb-icon">${p.icon}</span>
+          <span class="pb-name">${p.short}</span>
+          <span class="pb-desc">${p.desc}</span>
+        </button>`).join('')}
+      </div>
+      <button class="btn-close-modal" onclick="closeModal()">← Back to city</button>
+    </div>
+  </div>`;
+}
+
+function renderActivity(){
+  const m=S.currentMission, p=S.currentPath;
+  const c=CONTENT[m.id][p.id];
+  const isKine=p.id==='K';
+  const kineAllDone=isKine&&S.kineAnswers.length>=3;
+  const canShowQuiz=!isKine||(isKine&&kineAllDone);
+  const buildEnabled=S.quizPassed;
+
+  let content='';
+  if(isKine){
+    content=`<div class="act-content" style="background:${p.bg};border-color:${p.border}">
+      <div class="act-phase-label" style="color:${p.text}">🧪 Make real decisions — choose the best option for each scenario</div>
+      ${kineScenariosHtml()}
+    </div>`;
+  } else if(p.id==='A'){
+    // Render podcast content then inject EL key panel into the player
+    content=c.render().replace('<div class="tts-note">🔊 Uses your browser\'s text-to-speech — enable audio for full experience</div>',elKeyPanelHtml(p.color));
+  } else {
+    content=c.render();
+  }
+
+  return `<div id="screen-activity">
+    <div class="act-header">
+      <button onclick="backToCity()" style="background:none;border:1.5px solid #E0E0E0;border-radius:99px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--muted)">← City</button>
+      <div class="path-badge" style="background:${p.bg};color:${p.text||p.color};border:1.5px solid ${p.border}">${p.icon} ${p.name}</div>
+      <div class="act-title fredoka">${m.icon} ${m.name}</div>
+    </div>
+    <div class="act-body">
+      ${content}
+      ${canShowQuiz?quizHtml():'<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px 0;font-weight:700">Complete all three scenarios above to unlock the knowledge check ⬆</div>'}
+    </div>
+    <div class="build-bar">
+      <div class="build-hint">${buildEnabled?'🎉 Knowledge check passed! Build your '+m.name:S.quizSubmitted&&!S.quizPassed?'❌ Review the material and retry the quiz':'📝 Complete the knowledge check above to unlock building'}</div>
+      <button class="btn-build" ${buildEnabled?'':'disabled'} onclick="completeActivity()">🏗️ Build the ${m.name}!</button>
+    </div>
+  </div>`;
+}
+
+function renderBuilt(){
+  const m=S.currentMission, p=S.currentPath;
+  const qs=QUIZZES[m.id];
+  const score=qs.filter((q,i)=>S.quizAnswers[i]===q.ans).length;
+  const kineCorrect=S.kineAnswers.filter(Boolean).length;
+  const isKine=p.id==='K';
+  return `<div id="screen-built">
+    <div class="built-emoji">${m.icon}</div>
+    <h2 class="fredoka" style="font-size:2.3rem;color:#1A3D5C;margin:.4rem 0">${m.name} Built! 🎉</h2>
+    <p style="font-size:1rem;color:#3D6E8C;font-weight:600;max-width:340px;margin:0 auto">Citizens of Learnville are thrilled with their new ${m.name}!</p>
+    <div class="built-score-reveal">
+      <div class="bsr-stat"><span class="bsr-num" style="color:${p.color}">${isKine?kineCorrect+'/3':score+'/3'}</span><span class="bsr-lbl">${isKine?'Decisions':'Quiz Score'}</span></div>
+      <div class="bsr-stat"><span class="bsr-num" style="color:${S.totalAnswers>0?'#27AE60':'#95A5A6'}">${S.totalAnswers>0?Math.round(S.correctAnswers/S.totalAnswers*100)+'%':'—'}</span><span class="bsr-lbl">Overall Accuracy</span></div>
+      <div class="bsr-stat"><span class="bsr-num" style="color:${p.color}">${p.icon}</span><span class="bsr-lbl">${p.short} Style</span></div>
+    </div>
+    <div style="margin-top:.6rem;padding:13px 18px;background:rgba(255,255,255,.8);border-radius:14px;max-width:360px;font-size:13px;color:var(--muted);line-height:1.6">
+      <strong style="color:${p.color}">${p.name}:</strong> ${STYLE_DESC[p.id].slice(0,110)}...
+    </div>
+    ${S.completed.length>=5
+      ?`<button class="btn-continue" style="background:linear-gradient(135deg,#8E44AD,#E74C3C)" onclick="showResults()">🌟 See Your Full Learning Profile!</button>`
+      :`<button class="btn-continue" onclick="continueBuilding()">🏙️ Continue Building (${S.completed.length}/5)</button>`
+    }
+  </div>`;
+}
+
+function renderResults(){
+  const scores=PATHS.map(p=>({...p,count:S.styleScore[p.id]}));
+  const max=Math.max(...scores.map(s=>s.count),1);
+  const dom=scores.reduce((a,b)=>b.count>a.count?b:a);
+  const acc=S.totalAnswers>0?Math.round(S.correctAnswers/S.totalAnswers*100):0;
+  return `<div id="screen-results">
+    <div class="results-hero">
+      <div style="font-size:11px;font-weight:900;letter-spacing:.08em;background:rgba(255,255,255,.18);display:inline-block;padding:5px 16px;border-radius:99px;margin-bottom:8px">🌟 CITY COMPLETE</div>
+      <h2 class="fredoka">Your Learning Profile</h2>
+      <p style="opacity:.85;font-size:.95rem;font-weight:600">Learnville is built — your style is revealed!</p>
+    </div>
+    <div class="results-body">
+      <div class="dominant-card" style="background:linear-gradient(135deg,${dom.color},${dom.color}CC)">
+        <div class="dom-emoji">${dom.icon}</div>
+        <h3 class="dom-title fredoka">${dom.name}</h3>
+        <p class="dom-desc">${STYLE_DESC[dom.id]}</p>
+      </div>
+      <div class="accuracy-banner">
+        <div class="acc-stat"><span class="acc-num" style="color:${dom.color}">${dom.count}/5</span><span class="acc-lbl">${dom.short} Missions</span></div>
+        <div class="acc-stat"><span class="acc-num" style="color:${acc>=80?'#27AE60':acc>=60?'#F39C12':'#E74C3C'}">${acc}%</span><span class="acc-lbl">Knowledge Accuracy</span></div>
+        <div class="acc-stat"><span class="acc-num" style="color:#5B8FF9">${S.correctAnswers}/${S.totalAnswers}</span><span class="acc-lbl">Correct Answers</span></div>
+      </div>
+      <div class="breakdown-title">All Styles — Your Distribution</div>
+      ${scores.map(s=>{const pct=Math.round(s.count/max*100);return`<div class="rbc"><div class="rbc-icon">${s.icon}</div><div class="rbc-info"><div class="rbc-name">${s.short}${s.id===dom.id?` <span style="background:${s.color};color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:800">Primary</span>`:''}</div><div class="rbc-track"><div class="rbc-fill" style="width:${pct}%;background:${s.color}"></div></div></div><div class="rbc-pct" style="color:${s.color}">${s.count}/5</div></div>`}).join('')}
+      <div class="tips-card">
+        <h4 class="fredoka" style="font-size:1.05rem;margin-bottom:10px">💡 Tips for <span style="color:${dom.color}">${dom.short} Learners</span></h4>
+        ${STYLE_TIPS[dom.id].map(t=>`<div class="tip-pill" style="background:${dom.bg||'#F0F0F0'};color:${dom.text||dom.color}">✓ ${t}</div>`).join('')}
+      </div>
+      <div style="background:#fff;border-radius:16px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--text)">📊 What your accuracy score means:</strong><br>
+        ${acc>=80?'Exceptional. You engaged deeply with the evidence across all 5 missions.':acc>=60?'Good engagement. Some topics challenged you — those are worth revisiting.':'The content was demanding! Review the evidence briefs for the missions you found hardest.'}
+      </div>
+      <button class="btn-restart" onclick="restartGame()">🔄 Play Again — Try Different Paths</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════════════
+function startGame(){S.screen='city';render()}
+
+function openMission(id){
+  if(S.completed.includes(id))return;
+  S.currentMission=MISSIONS.find(m=>m.id===id);
+  S.modalOpen=true;
+  render();
+}
+
+function closeModal(){S.modalOpen=false;render()}
+function closeMissionBg(e){if(e.target.id==='mission-overlay')closeModal()}
+
+function choosePath(mId,pId){
+  S.currentMission=MISSIONS.find(m=>m.id===mId);
+  S.currentPath=PATHS.find(p=>p.id===pId);
+  S.kineScenario=0; S.kineAnswers=[]; S.kineChoices={};
+  S.quizAnswers=[null,null,null]; S.quizSubmitted=false; S.quizPassed=false; S.quizRetryUsed=false;
+  S.modalOpen=false; S.screen='activity';
+  ttsLineIndex=-1; ttsStartTime=0; S.audioPlaying=false;
+  render();
+  // init audio if auditory path
+  if(pId==='A'){
+    const audio=CONTENT[mId][pId].audio;
+    if(audio){
+      setTimeout(()=>{
+        initAudio(audio);
+      },200);
+    }
+  }
+}
+
+function kineChoose(scenIdx, optIdx){
+  if(scenIdx!==S.kineAnswers.length)return; // must do in order
+  if(!S.kineChoices)S.kineChoices={};
+  S.kineChoices[scenIdx]=optIdx;
+  const sc=CONTENT[S.currentMission.id].K.scenarios[scenIdx];
+  const correct=optIdx===sc.correct;
+  S.kineAnswers.push(correct);
+  // count toward overall accuracy
+  S.totalAnswers++;
+  if(correct)S.correctAnswers++;
+  render();
+}
+
+function selectQ(qi, oi){
+  if(S.quizSubmitted)return;
+  S.quizAnswers[qi]=oi;
+  render();
+}
+
+function submitQuiz(){
+  if(S.quizAnswers.includes(null))return;
+  S.quizSubmitted=true;
+  const qs=QUIZZES[S.currentMission.id];
+  const score=qs.filter((q,i)=>S.quizAnswers[i]===q.ans).length;
+  S.quizPassed=score>=2;
+  // track accuracy
+  S.totalAnswers+=3;
+  S.correctAnswers+=score;
+  render();
+}
+
+function retryQuiz(){
+  if(S.quizRetryUsed)return;
+  S.quizRetryUsed=true;
+  S.quizSubmitted=false;
+  S.quizAnswers=[null,null,null];
+  render();
+}
+
+function completeActivity(){
+  if(!S.quizPassed)return;
+  stopAudio();
+  const m=S.currentMission, p=S.currentPath;
+  if(!S.completed.includes(m.id)){
+    S.completed.push(m.id);
+    S.styleScore[p.id]=(S.styleScore[p.id]||0)+1;
+  }
+  S.screen='built';
+  render();
+  launchConfetti();
+}
+
+function backToCity(){stopAudio();S.screen='city';render()}
+function continueBuilding(){S.screen='city';render()}
+function showResults(){S.screen='results';render();setTimeout(()=>window.scrollTo(0,0),50)}
+function restartGame(){
+  stopAudio();
+  S={screen:'city',completed:[],styleScore:{V:0,A:0,R:0,K:0},totalScore:0,correctAnswers:0,totalAnswers:0,currentMission:null,currentPath:null,modalOpen:false,kineScenario:0,kineAnswers:[],quizAnswers:[null,null,null],quizSubmitted:false,quizPassed:false,quizRetryUsed:false,audioLines:[],audioIndex:-1,audioPlaying:false};
+  render();
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function render(){
+  const old=document.getElementById('mission-overlay');
+  if(old)old.remove();
+  const app=document.getElementById('app');
+  if(S.screen==='welcome')app.innerHTML=renderWelcome();
+  else if(S.screen==='city')app.innerHTML=renderCity();
+  else if(S.screen==='activity')app.innerHTML=renderActivity();
+  else if(S.screen==='built')app.innerHTML=renderBuilt();
+  else if(S.screen==='results')app.innerHTML=renderResults();
+  if(S.modalOpen&&S.currentMission&&S.screen==='city'){
+    const d=document.createElement('div');
+    d.innerHTML=renderModal();
+    document.body.appendChild(d.firstChild);
+  }
+  if(S.screen==='city'){
+    S.completed.forEach(id=>{const el=document.getElementById('built-'+id);if(el)el.classList.add('build-enter');});
+  }
+}
+
+render();
+</script>
+</body>
+</html>
